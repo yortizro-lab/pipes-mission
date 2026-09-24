@@ -92,3 +92,33 @@ function animateWater() {
 
   });
 }
+function startGame() {
+  clearInterval(timer);
+
+  score = 1000;
+  level = 1;
+  moves = 0;
+  time = 30;
+
+  scoreDisplay.textContent = score;
+  levelDisplay.textContent = level;
+  movesDisplay.textContent = moves;
+  timerDisplay.textContent = time;
+
+  message.textContent = "💧 Mission started! Connect the pipes!";
+  message.classList.remove("success");
+
+  createBoard();
+
+  timer = setInterval(() => {
+    time--;
+    timerDisplay.textContent = time;
+
+    if (time <= 0) {
+      clearInterval(timer);
+      message.textContent = "⏰ Time's up! Try again!";
+    }
+  }, 1000);
+}
+
+startButton.addEventListener("click", startGame);
