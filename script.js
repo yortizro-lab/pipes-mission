@@ -44,7 +44,7 @@ function createBoard() {
       let connections = solution[row][col];
 
       // Randomly rotate each pipe.
-      const rotations = Math.floor(Math.random() * 4);
+      const rotations = Math.floor(Math.random() * 2);
 
       for (let i = 0; i < rotations; i++) {
         connections = rotateConnections(connections);
