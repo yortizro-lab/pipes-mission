@@ -169,3 +169,75 @@ button:hover {
     min-height: 50px;
   }
 }
+
+/* Water flowing through connected pipes */
+.pipe-tile.flowing {
+  background: #0c4a6e;
+}
+
+.pipe-tile.flowing .pipe,
+.pipe-tile.flowing .pipe::before,
+.pipe-tile.flowing .pipe::after {
+  background: #7dd3fc;
+  box-shadow: 0 0 8px #7dd3fc;
+}
+
+.pipe-tile.flowing .pipe {
+  animation: waterPulse 0.8s infinite alternate;
+}
+
+@keyframes waterPulse {
+  from {
+    opacity: 0.6;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Winning effect */
+#message.success {
+  color: #7dd3fc;
+  font-size: 1.4rem;
+  animation: successPulse 1s infinite alternate;
+}
+
+@keyframes successPulse {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.05);
+  }
+}
+
+/* Scoreboard */
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px auto;
+  flex-wrap: wrap;
+}
+
+.scoreboard div {
+  background: #082f49;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  min-width: 100px;
+}
+
+.scoreboard span {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.scoreboard strong {
+  display: block;
+  font-size: 1.4rem;
+  color: #7dd3fc;
+  margin-top: 4px;
+}
