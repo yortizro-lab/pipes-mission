@@ -1,4 +1,4 @@
-const board = document.getElementById("pipeBoard");
+const board = document.getElementById("gameArea");
 const message = document.getElementById("message");
 const startButton = document.getElementById("startButton");
 
