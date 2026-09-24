@@ -70,8 +70,7 @@ function checkWin() {
 
     scoreDisplay.textContent = score;
 
-    message.textContent =
-      "💧 Mission complete! Water reached the EXIT! 🚰";
+    message.textContent = "💧 Mission complete! Water reached the EXIT! 🚰";
 
     message.classList.add("success");
 
