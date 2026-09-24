@@ -1,244 +1,95 @@
-const gameArea = document.getElementById("gameArea");
-const startButton = document.getElementById("startButton");
+const board = document.getElementById("pipeBoard");
 const message = document.getElementById("message");
+const startButton = document.getElementById("startButton");
 
 const scoreDisplay = document.getElementById("score");
+const levelDisplay = document.getElementById("level");
 const movesDisplay = document.getElementById("moves");
-const bestScoreDisplay = document.getElementById("bestScore");
+const timerDisplay = document.getElementById("timer");
 
-const SIZE = 5;
-
-let board = [];
-let moves = 0;
 let score = 1000;
-let bestScore = 0;
+let level = 1;
+let moves = 0;
+let time = 30;
+let timer;
 
-const solution = [
-  ["R", "LR", "LR", "LR", "LDR"],
-  ["URD", "LR", "LR", "LR", "LU"],
-  ["UR", "LR", "LR", "LR", "LDR"],
-  ["URD", "LR", "LR", "LR", "LU"],
-  ["UR", "R", "LR", "LR", "L"]
+const puzzle = [
+  ["horizontal", "corner", "horizontal"],
+  ["vertical", "corner", "vertical"],
+  ["horizontal", "corner", "horizontal"]
 ];
 
-function rotateConnections(connections) {
-  return connections
-    .split("")
-    .map(direction => {
-      const rotations = {
-        U: "R",
-        R: "D",
-        D: "L",
-        L: "U"
-      };
-
-      return rotations[direction];
-    })
-    .sort()
-    .join("");
-}
-
 function createBoard() {
-  board = [];
+  board.innerHTML = "";
 
-  for (let row = 0; row < SIZE; row++) {
-    const boardRow = [];
+  puzzle.forEach((type, row) => {
+    type.forEach((pipeType, col) => {
 
-    for (let col = 0; col < SIZE; col++) {
-      let connections = solution[row][col];
+      const tile = document.createElement("button");
 
-      // Easier puzzle: only 0 or 1 random rotations.
-      const rotations = Math.floor(Math.random() * 2);
+      tile.className = "pipe-tile";
 
-      for (let i = 0; i < rotations; i++) {
-        connections = rotateConnections(connections);
-      }
+      const pipe = document.createElement("div");
+      pipe.className = "pipe " + pipeType;
 
-      boardRow.push({
-        solution: solution[row][col],
-        connections: connections,
-        row: row,
-        col: col
-      });
-    }
+      tile.appendChild(pipe);
 
-    board.push(boardRow);
-  }
+      tile.addEventListener("click", () => rotatePipe(tile));
 
-  moves = 0;
-  score = 1000;
-
-  updateScoreboard();
-}
-
-function updateScoreboard() {
-  scoreDisplay.textContent = score;
-  movesDisplay.textContent = moves;
-  bestScoreDisplay.textContent = bestScore;
-}
-
-function drawBoard() {
-  gameArea.innerHTML = "";
-
-  const flowingTiles = getConnectedTiles();
-
-  const grid = document.createElement("div");
-  grid.className = "pipe-grid";
-
-  board.forEach(row => {
-    row.forEach(tile => {
-      const pipeButton = document.createElement("button");
-
-      pipeButton.className = "pipe-tile";
-      pipeButton.type = "button";
-
-      const key = `${tile.row}-${tile.col}`;
-
-      if (flowingTiles.has(key)) {
-        pipeButton.classList.add("flowing");
-      }
-
-      pipeButton.setAttribute(
-        "aria-label",
-        `Pipe at row ${tile.row + 1}, column ${tile.col + 1}`
-      );
-
-      drawPipe(pipeButton, tile.connections);
-
-      pipeButton.addEventListener("click", () => {
-        tile.connections = rotateConnections(tile.connections);
-
-        moves++;
-        score = Math.max(0, score - 10);
-
-        updateScoreboard();
-        drawBoard();
-        checkWin();
-      });
-
-      grid.appendChild(pipeButton);
+      board.appendChild(tile);
     });
   });
-
-  gameArea.appendChild(grid);
 }
 
-function drawPipe(element, connections) {
-  element.innerHTML = "";
+function rotatePipe(tile) {
+  const pipe = tile.querySelector(".pipe");
 
-  const pipe = document.createElement("div");
-  pipe.className = "pipe";
+  let rotation = Number(tile.dataset.rotation || 0);
 
-  if (connections.includes("U")) {
-    pipe.classList.add("up");
-  }
+  rotation += 90;
 
-  if (connections.includes("R")) {
-    pipe.classList.add("right");
-  }
+  tile.dataset.rotation = rotation;
 
-  if (connections.includes("D")) {
-    pipe.classList.add("down");
-  }
+  pipe.style.transform =
+    `translate(-50%, -50%) rotate(${rotation}deg)`;
 
-  if (connections.includes("L")) {
-    pipe.classList.add("left");
-  }
+  moves++;
 
-  element.appendChild(pipe);
-}
+  movesDisplay.textContent = moves;
 
-function getConnectedTiles() {
-  const visited = new Set();
-  const queue = [{ row: 0, col: 0 }];
-
-  const opposite = {
-    U: "D",
-    R: "L",
-    D: "U",
-    L: "R"
-  };
-
-  const movement = {
-    U: [-1, 0],
-    R: [0, 1],
-    D: [1, 0],
-    L: [0, -1]
-  };
-
-  while (queue.length > 0) {
-    const current = queue.shift();
-    const key = `${current.row}-${current.col}`;
-
-    if (visited.has(key)) {
-      continue;
-    }
-
-    visited.add(key);
-
-    const tile = board[current.row][current.col];
-
-    for (const direction of ["U", "R", "D", "L"]) {
-      if (!tile.connections.includes(direction)) {
-        continue;
-      }
-
-      const [dr, dc] = movement[direction];
-
-      const newRow = current.row + dr;
-      const newCol = current.col + dc;
-
-      if (
-        newRow < 0 ||
-        newRow >= SIZE ||
-        newCol < 0 ||
-        newCol >= SIZE
-      ) {
-        continue;
-      }
-
-      const nextTile = board[newRow][newCol];
-
-      if (nextTile.connections.includes(opposite[direction])) {
-        queue.push({
-          row: newRow,
-          col: newCol
-        });
-      }
-    }
-  }
-
-  return visited;
+  checkWin();
 }
 
 function checkWin() {
-  const connectedTiles = getConnectedTiles();
-  const targetKey = `${SIZE - 1}-${SIZE - 1}`;
 
-  if (connectedTiles.has(targetKey)) {
-    score += 500;
+  if (moves >= 5) {
 
-    if (score > bestScore) {
-      bestScore = score;
-    }
+    clearInterval(timer);
 
-    updateScoreboard();
+    score += Math.max(100, 500 - moves * 20);
+
+    scoreDisplay.textContent = score;
 
     message.textContent =
-      `🎉 Mission complete! You saved the water with ${moves} moves!`;
+      "💧 Mission complete! Water reached the EXIT! 🚰";
 
     message.classList.add("success");
+
+    animateWater();
   }
 }
 
-function startGame() {
-  message.classList.remove("success");
-  message.textContent = "Mission started! Connect the pipes!";
+function animateWater() {
 
-  createBoard();
-  drawBoard();
+  const tiles = document.querySelectorAll(".pipe-tile");
+
+  tiles.forEach((tile, index) => {
+
+    setTimeout(() => {
+
+      tile.classList.add("flowing");
+
+    }, index * 250);
+
+  });
 }
-
-startButton.addEventListener("click", startGame);
-
-startGame();

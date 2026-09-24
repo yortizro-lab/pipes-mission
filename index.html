@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Pipes Mission</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -15,33 +17,76 @@
   </header>
 
   <main>
+
     <section class="game">
-      <h2>Save the Water</h2>
-      <p>Connect the pipes and help the water reach its destination.</p>
 
-      <button id="startButton">Start Game</button>
-<div class="scoreboard">
-  <div>
-    <span>🏆 Score</span>
-    <strong id="score">1000</strong>
-  </div>
+      <h2>Fix the Pipes</h2>
 
-  <div>
-    <span>🔄 Moves</span>
-    <strong id="moves">0</strong>
-  </div>
+      <p class="instructions">
+        Connect the pipes from START to EXIT!
+      </p>
 
-  <div>
-    <span>⭐ Best</span>
-    <strong id="bestScore">0</strong>
-  </div>
-</div>
-      <div id="gameArea"></div>
+      <!-- Scoreboard -->
+      <div class="scoreboard">
 
-      <p id="message"></p>
+        <div>
+          <span>🏆 Score</span>
+          <strong id="score">1000</strong>
+        </div>
+
+        <div>
+          <span>⭐ Level</span>
+          <strong id="level">1</strong>
+        </div>
+
+        <div>
+          <span>🔄 Moves</span>
+          <strong id="moves">0</strong>
+        </div>
+
+      </div>
+
+      <!-- Timer -->
+      <div class="timer">
+        ⏱️ Time:
+        <strong id="timer">30</strong>
+      </div>
+
+      <!-- Pipe puzzle -->
+      <div id="gameArea">
+
+        <div class="pipe-game">
+
+          <div class="start">
+            💧
+            <span>START</span>
+          </div>
+
+          <div id="pipeBoard" class="pipe-board">
+          </div>
+
+          <div class="exit">
+            🚰
+            <span>EXIT</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <p id="message">
+        Connect the pipes!
+      </p>
+
+      <button id="startButton">
+        Start Mission
+      </button>
+
     </section>
+
   </main>
 
   <script src="script.js"></script>
+
 </body>
 </html>
