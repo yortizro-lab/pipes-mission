@@ -49,9 +49,9 @@ main {
 
 #pipeBoard {
   display: grid !important;
-  grid-template-columns: repeat(3, 80px) !important;
-  grid-template-rows: repeat(3, 80px) !important;
-  gap: 10px !important;
+  grid-template-columns: repeat(3, 65px) !important;
+  grid-template-rows: repeat(3, 65px) !important;
+  gap: 8px !important;
 
   width: fit-content !important;
   min-height: 280px !important;
@@ -68,8 +68,8 @@ main {
 }
 
 .pipe-tile {
-  width: 80px !important;
-  height: 80px !important;
+  width: 65px !important;
+  height: 65px !important;
 
   display: flex !important;
   align-items: center !important;
@@ -169,16 +169,14 @@ button#startButton:hover {
   }
 
   #pipeBoard {
-    grid-template-columns: repeat(3, 65px) !important;
-    grid-template-rows: repeat(3, 65px) !important;
-  }
-
-  .pipe-tile {
-    width: 65px !important;
-    height: 65px !important;
-  }
-
-  header h1 {
-    font-size: 2rem;
-  }
+  display: grid;
+  grid-template-columns: repeat(3, 65px);
+  grid-template-rows: repeat(3, 65px);
+  gap: 8px;
+  width: 211px;
+  height: 211px;
+  margin: 25px auto;
+  padding: 8px;
+  justify-content: center;
+  align-content: center;
 }
