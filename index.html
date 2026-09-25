@@ -18,6 +18,7 @@
     <section class="game-card">
 
       <h2>Fix the Pipes</h2>
+
       <p class="instructions">
         Repair the broken pipes and connect the faucet to the water exit!
       </p>
@@ -42,10 +43,9 @@
       <div class="timer">
         ⏱️ Time: <span id="timer">30</span>
       </div>
-     
-      <button id="startButton"></button>💧 Start</section>button>
-      
-      <!-- WATER SYSTEM -->
+
+      <button id="startButton">💧 START</button>
+
       <div id="waterSystem">
 
         <div class="faucet">
@@ -53,18 +53,23 @@
           <span>START</span>
         </div>
 
-      <div id="pipeBoard">
+        <div id="pipeBoard"></div>
 
-  <div class="faucet">
-    🚰
-    <span>WATER START</span>
-  </div>
+        <div id="waterFlow"></div>
 
-  <div id="waterFlow"></div>
+        <div class="exit">
+          💧
+          <span>EXIT</span>
+        </div>
 
-</div>
+      </div>
 
-<div class="exit">
-  💧
-  <span>EXIT</span>
-</div> 
+      <p id="message"></p>
+
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
