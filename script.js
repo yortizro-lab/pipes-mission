@@ -165,11 +165,12 @@ function createBoard() {
       board.appendChild(tile);
 
       updatePipeVisual(tile, pipe);
+      }
     }
   }
 
   addWaterMarkers();
-}
+
 
 // ------------------------------------------------------
 // FAUCET AND EXIT
