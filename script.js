@@ -305,7 +305,6 @@ function updatePipeVisual(tile, pipe) {
 // ------------------------------------------------------
 
 function rotatePipe(index) {
-
   if (!gameStarted || gameOver) return;
 
   const pipe = pipes[index];
@@ -314,20 +313,20 @@ function rotatePipe(index) {
 
   moves++;
 
-  score = Math.max(0, score - 5);
+  // Increase score for making a move
+  score += 10;
 
   updateDisplays();
 
   const tile = board.children[index];
 
+  // Keep the pipe rotated
   tile.style.transform = `rotate(${pipe.rotation * 90}deg)`;
-
-  setTimeout(() => {
-    tile.style.transform = "";
-  }, 200);
 
   checkWaterFlow();
 }
+
+  
 
 // ------------------------------------------------------
 // CHECK WATER FLOW
