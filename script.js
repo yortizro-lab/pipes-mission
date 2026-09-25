@@ -312,17 +312,14 @@ function rotatePipe(index) {
   pipe.rotation = (pipe.rotation + 1) % 4;
 
   moves++;
-
-  // Increase score for making a move
   score += 10;
-
-  updateDisplays();
 
   const tile = board.children[index];
 
-  // Keep the pipe rotated
-  tile.style.transform = `rotate(${pipe.rotation * 90}deg)`;
+  // Rotate the actual pipe
+  updatePipeVisual(tile, pipe);
 
+  updateDisplays();
   checkWaterFlow();
 }
 
@@ -333,111 +330,141 @@ function rotatePipe(index) {
 // ------------------------------------------------------
 
 function checkWaterFlow() {
+ let connected = new Set();
+  let queue = [0];
 
-  const pathCorrect = pipes.every((pipe, index) => {
+  while (queue.length > 0) {
+    const index = queue.shift();
 
-    const solutionIndex = solutionPath.findIndex(
-      position =>
-        position[0] === pipe.row &&
-        position[1] === pipe.col
-    );
+    if (connected.has(index)) continue;
+    connected.add(index);
 
-    if (solutionIndex === -1) return true;
+    const pipe = pipes[index];
+    const connections = getRotatedConnections(pipe);
 
-    const needed = getSolutionConnections(solutionIndex);
+    const directions = {
+      top: [-1, 0],
+      right: [0, 1],
+      bottom: [1, 0],
+      left: [0, -1]
+    };
 
-    return needed.length === 2;
-  });
+    for (const direction of connections) {
+      const [dr, dc] = directions[direction];
 
-  if (!pathCorrect) {
-    message.textContent = "🔧 Keep fixing the broken pipes!";
-    return;
+      const newRow = pipe.row + dr;
+      const newCol = pipe.col + dc;
+
+      if (
+        newRow < 0 ||
+        newRow >= SIZE ||
+        newCol < 0 ||
+        newCol >= SIZE
+      ) {
+        continue;
+      }
+
+      const nextIndex = newRow * SIZE + newCol;
+      const nextPipe = pipes[nextIndex];
+
+      if (!nextPipe) continue;
+
+      const opposite = {
+        top: "bottom",
+        right: "left",
+        bottom: "top",
+        left: "right"
+      };
+
+      const nextConnections =
+        getRotatedConnections(nextPipe);
+
+      if (nextConnections.includes(opposite[direction])) {
+        queue.push(nextIndex);
+      }
+    }
   }
 
-  // All pipes are repaired
-  pipes.forEach((pipe, index) => {
-
-    pipe.fixed = true;
-
-    const tile = board.children[index];
-
-    tile.classList.remove("broken");
-    tile.classList.add("fixed");
-
-    const broken = tile.querySelector(".broken-mark");
-
-    if (broken) {
-      broken.textContent = "💧";
-    }
-
-    tile.style.background = "#087fbd";
-    tile.style.boxShadow = "0 0 15px #36e0ff";
-  });
-
-  startWaterAnimation();
+  if (connected.has(8)) {
+    startWaterAnimation();
+  } else {
+    message.textContent =
+      "🔧 Keep fixing the broken pipes!";
+  }
 }
+
+
+
+
+  // All pipes are repaired
+ 
 
 // ------------------------------------------------------
 // RUNNING WATER
 // ------------------------------------------------------
 
 function startWaterAnimation() {
+  if (gameOver) return;
 
   message.textContent = "💧 Water is flowing through the repaired pipes!";
 
   const water = document.createElement("div");
 
   water.id = "runningWater";
-
-  water.innerHTML = "💦";
+  water.innerHTML = "💧";
 
   water.style.position = "fixed";
-  water.style.fontSize = "30px";
+  water.style.fontSize = "28px";
   water.style.zIndex = "9999";
-  water.style.transition = "all 1s linear";
+  water.style.pointerEvents = "none";
+  water.style.transition = "all 0.45s linear";
 
   document.body.appendChild(water);
 
-  const firstTile = board.children[0];
-  const lastTile = board.children[8];
+  const path = solutionPath.map(([row, col]) => {
+    return row * SIZE + col;
+  });
 
-  const firstRect = firstTile.getBoundingClientRect();
-  const lastRect = lastTile.getBoundingClientRect();
+  let step = 0;
 
-  water.style.left =
-    `${firstRect.left + firstRect.width / 2}px`;
+  function moveWater() {
+    const tile = board.children[path[step]];
 
-  water.style.top =
-    `${firstRect.top + firstRect.height / 2}px`;
+    if (!tile) return;
 
-  setTimeout(() => {
+    const rect = tile.getBoundingClientRect();
 
     water.style.left =
-      `${lastRect.left + lastRect.width / 2}px`;
+      `${rect.left + rect.width / 2 - 14}px`;
 
     water.style.top =
-      `${lastRect.top + lastRect.height / 2}px`;
+      `${rect.top + rect.height / 2 - 14}px`;
 
-  }, 100);
+    step++;
 
-  setTimeout(() => {
+    if (step < path.length) {
+      setTimeout(moveWater, 500);
+    } else {
+      setTimeout(() => {
+        water.remove();
 
-    water.remove();
+        score += 500;
+        updateDisplays();
 
-    score += 500;
+        message.textContent =
+          "🎉 Mission complete! The water reached the exit!";
 
-    message.textContent =
-      "🎉 Mission complete! The water reached the exit!";
+        gameOver = true;
 
-    gameOver = true;
-
-    if (timer) {
-      clearInterval(timer);
+        if (timer) {
+          clearInterval(timer);
+        }
+      }, 600);
     }
+  }
 
-  }, 1200);
+  moveWater();
 }
-
 // ------------------------------------------------------
 // TIMER
 // ------------------------------------------------------
@@ -454,7 +481,6 @@ function startTimer() {
 
     timeLeft--;
 
-    score = Math.max(0, score - 2);
 
     updateDisplays();
 

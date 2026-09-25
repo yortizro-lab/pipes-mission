@@ -77,24 +77,19 @@ main {
 
   position: relative !important;
 
-  border: 3px solid #48cae4 !important;
-  border-radius: 12px !important;
-
-  background: #075985 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
 
   cursor: pointer !important;
-
   padding: 0 !important;
 }
 
-.pipe-tile:hover {
-  transform: scale(1.05);
-  background: #087fbd !important;
-}
+
 
 .pipe-tile.fixed {
-  background: #006d77 !important;
-  box-shadow: 0 0 15px #48cae4 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .broken-mark {
