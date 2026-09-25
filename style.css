@@ -10,474 +10,175 @@ body {
   text-align: center;
 }
 
-.header {
-  padding: 25px 15px;
+header {
+  background: #023e8a;
+  padding: 25px;
 }
 
-.header h1 {
+header h1 {
   margin: 0;
-  font-size: 2.6rem;
+  font-size: 2.5rem;
 }
 
-.header p {
-  margin-top: 8px;
+header p {
   font-size: 1.2rem;
-  color: #90e0ef;
 }
 
 main {
-  padding: 20px;
+  padding: 30px 15px;
 }
 
 .game-card {
-  width: min(900px, 95%);
+  max-width: 900px;
   margin: auto;
+  background: rgba(0, 40, 90, 0.8);
   padding: 30px;
   border-radius: 25px;
-  background: rgba(10, 25, 55, 0.9);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .game-card h2 {
-  margin-bottom: 10px;
   font-size: 2.2rem;
+  margin-bottom: 10px;
 }
-
-.instructions {
-  font-size: 1.1rem;
-}
-
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  margin: 25px 0 15px;
-  flex-wrap: wrap;
-}
-
-.stats div {
-  min-width: 120px;
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(0, 150, 220, 0.25);
-}
-
-.stats strong {
-  display: block;
-  margin-top: 5px;
-  font-size: 1.4rem;
-  color: #90e0ef;
-}
-
-.timer {
-  font-size: 1.3rem;
-  margin: 15px;
-}
-
-/* WATER SYSTEM */
 
 #waterSystem {
-  position: relative;
-  width: 100%;
-  max-width: 650px;
-  margin: 25px auto;
-  padding: 25px;
-  border: 3px solid #48cae4;
-  border-radius: 20px;
-  background: #023e5a;
-}
-
-/* FAUCET */
-
-.faucet {
-  position: absolute;
-  left: -5px;
-  top: 50%;
-  transform: translate(-100%, -50%);
-  font-size: 3rem;
-  width: 100px;
-}
-
-.faucet span,
-.exit span {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: #90e0ef;
-}
-
-/* EXIT */
-
-.exit {
-  position: absolute;
-  right: -5px;
-  top: 50%;
-  transform: translate(100%, -50%);
-  font-size: 2.5rem;
-  width: 100px;
+  margin: 20px auto;
+  font-size: 1.2rem;
 }
 
 #pipeBoard {
   display: grid !important;
   grid-template-columns: repeat(3, 80px) !important;
   grid-template-rows: repeat(3, 80px) !important;
-  gap: 8px !important;
-  width: 256px !important;
-  margin: auto;
-  justify-content: center;
-  align-content: center;
+  gap: 10px !important;
+
+  width: fit-content !important;
+  min-height: 280px !important;
+
+  margin: 20px auto !important;
+  padding: 20px !important;
+
+  justify-content: center !important;
+  align-content: center !important;
+
+  background: #023e8a !important;
+  border: 4px solid #48cae4 !important;
+  border-radius: 20px !important;
 }
 
-/* PIPE TILE */
-
 .pipe-tile {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  border: 3px solid #1677a8;
-  border-radius: 12px;
-  background: #073b5c;
-  cursor: pointer;
-  padding: 0;
-  transition: 0.2s;
+  width: 80px !important;
+  height: 80px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  position: relative !important;
+
+  border: 3px solid #48cae4 !important;
+  border-radius: 12px !important;
+
+  background: #075985 !important;
+
+  cursor: pointer !important;
+
+  padding: 0 !important;
 }
 
 .pipe-tile:hover {
   transform: scale(1.05);
-  border-color: #90e0ef;
+  background: #087fbd !important;
 }
 
-/* BROKEN PIPE */
-
-.pipe-tile.broken {
-  background: #4a2930;
-  border-color: #ff6b6b;
+.pipe-tile.fixed {
+  background: #006d77 !important;
+  box-shadow: 0 0 15px #48cae4 !important;
 }
-
-.pipe-tile.broken::after {
-  content: "BROKEN";
-  position: absolute;
-  bottom: 2px;
-  left: 0;
-  width: 100%;
-  font-size: 8px;
-  color: #ffb3b3;
-  font-weight: bold;
-}
-
-/* PIPE SHAPE */
-
-.pipe-shape {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 22px;
-  height: 60px;
-  transform-origin: center;
-  transform: translate(-50%, -50%);
-  background: #48cae4;
-  border-radius: 5px;
-  box-shadow: inset 0 0 8px rgba(255,255,255,0.5);
-}
-
-.pipe-shape::before {
-  content: "";
-  position: absolute;
-  background: #48cae4;
-}
-
-/* STRAIGHT PIPE */
-
-.pipe-shape.straight {
-  width: 22px;
-  height: 60px;
-}
-
-.pipe-shape.straight::before {
-  width: 22px;
-  height: 60px;
-  left: 0;
-  top: 0;
-}
-
-/* CORNER PIPE */
-
-.pipe-shape.corner {
-  width: 60px;
-  height: 60px;
-  background: transparent;
-}
-
-.pipe-shape.corner::before {
-  width: 22px;
-  height: 60px;
-  left: 19px;
-  top: 0;
-  background: #48cae4;
-  border-radius: 5px;
-}
-
-.pipe-shape.corner::after {
-  content: "";
-  position: absolute;
-  width: 60px;
-  height: 22px;
-  left: 19px;
-  top: 38px;
-  background: #48cae4;
-  border-radius: 5px;
-}
-
-/* BROKEN MARK */
 
 .broken-mark {
-  position: absolute;
+  position: absolute !important;
+  top: 3px !important;
+  right: 5px !important;
+
+  font-size: 15px !important;
   z-index: 5;
-  right: 3px;
-  top: 2px;
-  font-size: 15px;
 }
 
-/* CONNECTED PIPE */
+.pipe-shape {
+  display: block !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
 
-.pipe-tile.connected {
-  background: #064b6e;
-  border-color: #48cae4;
+  transform: translate(-50%, -50%) !important;
+
+  background: #90f5ff !important;
+  border-radius: 10px !important;
 }
 
-.pipe-tile.connected .broken-mark {
-  color: #48cae4;
+.game-faucet,
+.game-exit {
+  text-align: center;
+  margin: 15px auto;
+  color: white;
 }
 
-/* WATER FLOW */
-
-.pipe-tile.flowing .pipe-shape,
-.pipe-tile.connected .pipe-shape {
-  background: linear-gradient(
-    90deg,
-    #48cae4,
-    #caf0f8,
-    #48cae4
-  );
-  background-size: 200% 100%;
-  animation: waterFlow 0.8s linear infinite;
+.game-faucet {
+  font-size: 1.1rem;
 }
 
-.pipe-tile.connected::after {
-  content: "";
+.game-exit {
+  font-size: 1.1rem;
 }
-
-@keyframes waterFlow {
-  from {
-    background-position: 200% 0;
-  }
-
-  to {
-    background-position: 0 0;
-  }
-}
-
-/* REPAIR ANIMATION */
-
-.pipe-tile.repairing {
-  animation: repair 0.2s ease;
-}
-
-@keyframes repair {
-  50% {
-    transform: scale(1.12);
-  }
-}
-
-/* SUCCESS MESSAGE */
 
 #message {
-  min-height: 30px;
   font-size: 1.2rem;
   font-weight: bold;
   margin: 20px;
 }
 
-#message.success {
-  color: #90ee90;
-}
+button#startButton {
+  background: #00b4d8;
+  color: white;
 
-/* BUTTON */
-
-#startButton {
   border: none;
-  border-radius: 12px;
-  padding: 15px 30px;
+  padding: 14px 28px;
+
   font-size: 1.1rem;
   font-weight: bold;
-  color: white;
-  background: #00b4d8;
+
+  border-radius: 12px;
+
   cursor: pointer;
 }
 
-#startButton:hover {
-  background: #0096c7;
-  transform: scale(1.05);
+button#startButton:hover {
+  background: #48cae4;
 }
 
-/* MOBILE */
+#runningWater {
+  pointer-events: none;
+}
 
-@media (max-width: 700px) {
+@media (max-width: 600px) {
 
   .game-card {
     padding: 20px 10px;
   }
 
-  .faucet {
-    position: static;
-    transform: none;
-    margin: 0 auto 10px;
+  #pipeBoard {
+    grid-template-columns: repeat(3, 65px) !important;
+    grid-template-rows: repeat(3, 65px) !important;
   }
 
-  .exit {
-    position: static;
-    transform: none;
-    margin: 10px auto 0;
+  .pipe-tile {
+    width: 65px !important;
+    height: 65px !important;
   }
 
-  #waterSystem {
-    padding: 15px;
-  }
-}
-
-/* =================================
-   BROKEN PIPES + WATER SYSTEM
-   ================================= */
-
-#pipeBoard {
-  position: relative;
-  min-height: 300px;
-  background: #071b2b;
-  border: 4px solid #38bdf8;
-  border-radius: 18px;
-  padding: 70px 20px 30px;
-  overflow: hidden;
-}
-
-/* Faucet */
-.faucet {
-  position: absolute;
-  left: 20px;
-  top: 15px;
-  font-size: 32px;
-  color: white;
-  z-index: 10;
-}
-
-.faucet span {
-  font-size: 12px;
-  display: block;
-  color: #7dd3fc;
-  font-weight: bold;
-}
-
-/* Water coming from faucet */
-#waterFlow {
-  position: absolute;
-  left: 48px;
-  top: 55px;
-  width: 12px;
-  height: 45px;
-  background: #38bdf8;
-  border-radius: 10px;
-  animation: waterDrop 0.8s infinite;
-}
-
-@keyframes waterDrop {
-  0% {
-    height: 10px;
-    opacity: 0.4;
-  }
-
-  50% {
-    height: 45px;
-    opacity: 1;
-  }
-
-  100% {
-    height: 10px;
-    opacity: 0.4;
-  }
-}
-
-/* Broken pipe pieces */
-.pipe-tile {
-  position: relative;
-  width: 65px;
-  height: 65px;
-  background: #263b4d;
-  border: 3px solid #64748b;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-/* Make pipes look broken */
-.pipe-tile::before,
-.pipe-tile::after {
-  content: "";
-  position: absolute;
-  background: #38bdf8;
-  box-shadow: 0 0 8px #38bdf8;
-}
-
-.pipe-tile:hover {
-  transform: rotate(5deg);
-  border-color: #facc15;
-}
-
-/* Horizontal pipe */
-.pipe.horizontal::before {
-  width: 100%;
-  height: 18px;
-  left: 0;
-  top: 23px;
-}
-
-/* Vertical pipe */
-.pipe.vertical::before {
-  width: 18px;
-  height: 100%;
-  left: 23px;
-  top: 0;
-}
-
-/* Corner pipe */
-.pipe.corner::before {
-  width: 42px;
-  height: 18px;
-  left: 0;
-  top: 23px;
-}
-
-.pipe.corner::after {
-  width: 18px;
-  height: 42px;
-  left: 24px;
-  top: 23px;
-}
-
-/* Water flowing through a repaired pipe */
-.pipe-tile.flowing::before,
-.pipe-tile.flowing::after {
-  background: #67e8f9;
-  box-shadow:
-    0 0 8px #38bdf8,
-    0 0 16px #38bdf8;
-  animation: waterPulse 0.7s infinite;
-}
-
-@keyframes waterPulse {
-  0%, 100% {
-    opacity: 0.6;
-  }
-
-  50% {
-    opacity: 1;
+  header h1 {
+    font-size: 2rem;
   }
 }
