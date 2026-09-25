@@ -3,90 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Pipes Mission</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <header>
+  <header class="header">
     <h1>💧 Pipes Mission</h1>
     <p>Every drop counts!</p>
   </header>
 
   <main>
-
-    <section class="game">
+    <section class="game-card">
 
       <h2>Fix the Pipes</h2>
-
       <p class="instructions">
-        Connect the pipes from START to EXIT!
+        Repair the broken pipes and connect the faucet to the water exit!
       </p>
 
-      <!-- Scoreboard -->
-      <div class="scoreboard">
-
+      <div class="stats">
         <div>
-          <span>🏆 Score</span>
+          🏆 Score
           <strong id="score">1000</strong>
         </div>
 
         <div>
-          <span>⭐ Level</span>
+          ⭐ Level
           <strong id="level">1</strong>
         </div>
 
         <div>
-          <span>🔄 Moves</span>
+          🔄 Moves
           <strong id="moves">0</strong>
         </div>
-
       </div>
 
-      <!-- Timer -->
       <div class="timer">
-        ⏱️ Time:
-        <strong id="timer">30</strong>
+        ⏱️ Time: <span id="timer">30</span>
       </div>
 
-      <!-- Pipe puzzle -->
-      <div id="gameArea">
+      <!-- WATER SYSTEM -->
+      <div id="waterSystem">
 
-        <div class="pipe-game">
-
-          <div class="start">
-            💧
-            <span>START</span>
-          </div>
-
-          <div id="pipeBoard" class="pipe-board">
-          </div>
-
-          <div class="exit">
-            🚰
-            <span>EXIT</span>
-          </div>
-
+        <div class="faucet">
+          🚰
+          <span>START</span>
         </div>
 
-      </div>
+      <div id="pipeBoard">
 
-      <p id="message">
-        Connect the pipes!
-      </p>
+  <div class="faucet">
+    🚰
+    <span>WATER START</span>
+  </div>
 
-      <button id="startButton">
-        Start Mission
-      </button>
+  <div id="waterFlow"></div>
 
-    </section>
+</div>
 
-  </main>
-
-  <script src="script.js"></script>
-
-</body>
-</html>
+<div class="exit">
+  💧
+  <span>EXIT</span>
+</div> 
