@@ -159,7 +159,7 @@ function createBoard() {
       `;
 
       tile.addEventListener("click", function () {
-        rotatePipe(pipes.length - 1);
+        rotatePipe(Number(tile.datase.index)); 
       });
 
       board.appendChild(tile);
