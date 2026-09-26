@@ -39,7 +39,7 @@ const solutionPath = [
   [0, 2],
   [1, 2],
   [1, 1],
-  [1, 0],
+  [1, 0],function get
   [2, 0],
   [2, 1],
   [2, 2]
@@ -50,27 +50,41 @@ const solutionPath = [
 // ------------------------------------------------------
 
 function getSolutionConnections(index) {
-  const current = solutionPath[index];
+    const current = solutionPath[index];
+    const connections = [];
 
-  const connections = [];
+    // Connection to the previous pipe
+    if (index > 0) {
+        const previous = solutionPath[index - 1];
 
-  if (index > 0) {
-    const previous = solutionPath[index - 1];
+        if (previous[0] < current[0]) connections.push("top");
+        if (previous[0] > current[0]) connections.push("bottom");
+        if (previous[1] < current[1]) connections.push("left");
+        if (previous[1] > current[1]) connections.push("right");
+    }
 
-    if (previous[0] < current[0]) connections.push("top");
-    if (previous[0] > current[0]) connections.push("bottom");
-    if (previous[1] < current[1]) connections.push("left");
-    if (previous[1] > current[1]) connections.push("right");
-  }
+    // Connection to the next pipe
+    if (index < solutionPath.length - 1) {
+        const next = solutionPath[index + 1];
 
-  if (index < solutionPath.length - 1) {
-    const next = solutionPath[index + 1];
+        if (next[0] < current[0]) connections.push("top");
+        if (next[0] > current[0]) connections.push("bottom");
+        if (next[1] < current[1]) connections.push("left");
+        if (next[1] > current[1]) connections.push("right");
+    }
 
-    if (next[0] < current[0]) connections.push("top");
-    if (next[0] > current[0]) connections.push("bottom");
-    if (next[1] < current[1]) connections.push("left");
-    if (next[1] > current[1]) connections.push("right");
-  }
+    // Faucet connects to the first pipe
+    if (index === 0) {
+        connections.push("top");
+    }
+
+    // Last pipe connects to the water exit
+    if (index === solutionPath.length - 1) {
+        connections.push("bottom");
+    }
+
+    return connections;
+}
 
   return connections;
 }
