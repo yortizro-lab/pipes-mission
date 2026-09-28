@@ -170,10 +170,10 @@ function createBoard() {
         <span class="pipe-shape ${type}"></span>
       `;
 
-      tile.addEventListener("click", function () {
-        const index = Number(tile.dataset.index); 
+      tile.addEventListener("click", () => {
+        const index = Number(tile.dataset.index);
         rotatePipe(index);
-      });
+       });
 
       board.appendChild(tile);
 
