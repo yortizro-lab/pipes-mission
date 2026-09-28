@@ -514,9 +514,8 @@ function startTimer() {
 // START GAME
 // ------------------------------------------------------
 
-function startGame() {
-
-  score = 1000;
+function gameStartedstartGame(){
+  score = 0;
   level = 1;
   moves = 0;
   timeLeft = 30;
