@@ -160,7 +160,7 @@ function createBoard() {
         row: row,
         col: col,
         correctConnections: connections,
-        rotation: Math.floor(MathMLElement.random() * 4),
+        rotation: Math.floor(Math.random() * 4),
         fixed: false
       };
 
