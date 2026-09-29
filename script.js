@@ -329,8 +329,10 @@ faucet.addEventListener("click", () => {
 });
 
   faucet.style.textAlign = "center";
-  faucet.style.margin = "0px auto";
+  faucet.style.width = "80px";
+  faucet.style.margin = "0px auto 0px 0px";
   faucet.style.color = "white";
+  faucet.style.transform ="none";
 
   board.parentElement.insertBefore(faucet, board);
 
