@@ -330,7 +330,7 @@ faucet.addEventListener("click", () => {
 
   faucet.style.textAlign = "center";
   faucet.style.width = "80px";
-  faucet.style.margin = "0px auto 0px 0px";
+  faucet.style.margin = "0px 0px 0px calc((100% - 240) / 2)";
   faucet.style.color = "white";
   faucet.style.transform ="none";
 
