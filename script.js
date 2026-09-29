@@ -11,7 +11,7 @@ const levelDisplay = document.getElementById("level");
 const movesDisplay = document.getElementById("moves");
 const timerDisplay = document.getElementById("timer");
 
-let score = 1000;
+let score = 0;
 let level = 1;
 let moves = 0;
 let timeLeft = 30;
@@ -83,10 +83,6 @@ function getSolutionConnections(index) {
 
     return connections;
 }
-
-  return connections;
-}
-
 // ------------------------------------------------------
 // PIPE TYPE
 // ------------------------------------------------------
@@ -514,7 +510,7 @@ function startTimer() {
 // START GAME
 // ------------------------------------------------------
 
-function gameStartedstartGame(){
+function startGame(){
   score = 0;
   level = 1;
   moves = 0;
@@ -532,6 +528,7 @@ function gameStartedstartGame(){
   startTimer();
 }
 
+startButton.addEventListener("click", startGame );
 // ------------------------------------------------------
 // UPDATE DISPLAY
 // ------------------------------------------------------
