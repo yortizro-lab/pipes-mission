@@ -83,6 +83,7 @@ function getSolutionConnections(index) {
 
     return connections;
 }
+
 // ------------------------------------------------------
 // PIPE TYPE
 // ------------------------------------------------------
