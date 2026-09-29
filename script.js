@@ -292,13 +292,25 @@ function checkWaterFlow() {
         getRotatedConnections(lastPipe).includes("bottom");
 
     if (reachesExit) {
-        message.textContent = "💧 Water reached the exit!";
-        gameOver = true;
-        clearInterval(timer);
-    } else {
-        message.textContent = "🚰 Keep connecting the pipes!";
-    }
-}   
+    message.textContent = "💧 Water is flowing to the exit!";
+
+    connected.forEach(index => {
+        const tile = board.children[index];
+
+        if (tile) {
+            const shape = tile.querySelector(".pipe-shape");
+
+            if (shape) {
+                shape.classList.add("water-active");
+            }
+        }
+    });
+
+    gameOver = true;
+    clearInterval(timer);
+} else {
+    message.textContent = "🚰 Keep connecting the pipes!";
+}
 
 // ------------------------------------------------------
 // FAUCET AND EXIT
