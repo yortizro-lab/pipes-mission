@@ -283,13 +283,10 @@ function checkWaterFlow() {
         }
     }
 
-    const lastIndex = pipes.length - 1;
-    const lastPipe = pipes[lastIndex];
+   const lastIndex = pipes.length - 1;
+   const lastPipe = pipes[lastIndex];
 
     // Exit must connect from the bottom of the last pipe
-   const lastIndex = pipes.length - 1;
-const lastPipe = pipes[lastIndex];
-
 const reachesExit =
     connected.has(lastIndex) &&
     getRotatedConnections(lastPipe).includes("bottom");
@@ -314,6 +311,7 @@ if (reachesExit) {
 } else {
     message.textContent = "🚰 Keep connecting the pipes!";
 } 
+}
 
 // ------------------------------------------------------
 // PIPE VISUAL
