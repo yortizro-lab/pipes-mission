@@ -133,7 +133,7 @@ function createBoard() {
   board.style.gap = "0px";
   board.style.justifyContent = "center";
   board.style.alignItems = "center";
-  board.style.padding = "20px";
+  board.style.padding = "0px";
 
   for (let row = 0; row < SIZE; row++) {
     for (let col = 0; col < SIZE; col++) {
@@ -221,7 +221,7 @@ function addWaterMarkers() {
   `;
 
   faucet.style.textAlign = "center";
-  faucet.style.margin = "10px auto";
+  faucet.style.margin = "0px auto";
   faucet.style.color = "white";
 
   board.parentElement.insertBefore(faucet, board);
@@ -235,7 +235,7 @@ function addWaterMarkers() {
   `;
 
   exit.style.textAlign = "center";
-  exit.style.margin = "10px auto";
+  exit.style.margin = "0px auto";
   exit.style.color = "white";
 
   board.parentElement.appendChild(exit);
