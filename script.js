@@ -218,6 +218,7 @@ function rotatePipe(index) {
     updateDisplays();
     checkWaterFlow();
 }
+
 // ------------------------------------------------------
 // FAUCET AND EXIT
 // ------------------------------------------------------
