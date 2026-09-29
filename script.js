@@ -218,7 +218,65 @@ function rotatePipe(index) {
     updateDisplays();
     checkWaterFlow();
 }
+function checkWaterFlow() {
+    const connected = new Set();
+    const queue = [0];
 
+    while (queue.length > 0) {
+        const index = queue.shift();
+
+        if (connected.has(index)) continue;
+
+        connected.add(index);
+
+        const pipe = pipes[index];
+        if (!pipe) continue;
+
+        const connections = getRotatedConnections(pipe);
+
+        const directions = {
+            top: [-1, 0],
+            right: [0, 1],
+            bottom: [1, 0],
+            left: [0, -1]
+        };
+
+        const opposite = {
+            top: "bottom",
+            right: "left",
+            bottom: "top",
+            left: "right"
+        };
+
+        for (const direction of connections) {
+            const [dr, dc] = directions[direction];
+
+            const newRow = pipe.row + dr;
+            const newCol = pipe.col + dc;
+
+            const nextIndex = pipes.findIndex(
+                p => p.row === newRow && p.col === newCol
+            );
+
+            if (nextIndex === -1) continue;
+
+            const nextPipe = pipes[nextIndex];
+            const nextConnections =
+                getRotatedConnections(nextPipe);
+
+            if (nextConnections.includes(opposite[direction])) {
+                queue.push(nextIndex);
+            }
+        }
+    }
+
+    // The last pipe is connected to the single water exit
+    if (connected.has(pipes.length - 1)) {
+        message.textContent = "💧 Water reached the exit!";
+        gameOver = true;
+        clearInterval(timer);
+    }
+}
 // ------------------------------------------------------
 // FAUCET AND EXIT
 // ------------------------------------------------------
