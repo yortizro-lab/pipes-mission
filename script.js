@@ -200,7 +200,24 @@ function createBoard() {
 }
   addWaterMarkers();
 
+function rotatePipe(index) {
+    if (!gameStarted || gameOver) return;
 
+    const pipe = pipes[index];
+
+    if (!pipe) return;
+
+    pipe.rotation = (pipe.rotation + 1) % 4;
+
+    moves++;
+    score += 10;
+
+    const tile = board.children[index];
+
+    updatePipeVisual(tile, pipe);
+    updateDisplays();
+    checkWaterFlow();
+}
 // ------------------------------------------------------
 // FAUCET AND EXIT
 // ------------------------------------------------------
