@@ -246,7 +246,7 @@ function updatePipeVisual(tile, pipe) {
 
   if (!shape) return;
 
-  shape.style.dysplay = "block";ssss
+  shape.style.dysplay = "block";
 
   shape.style.display = "block";
   shape.style.position = "absolute";
