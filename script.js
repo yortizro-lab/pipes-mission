@@ -247,114 +247,106 @@ function addWaterMarkers() {
 // ------------------------------------------------------
 
 function updatePipeVisual(tile, pipe) {
+    const shape = tile.querySelector(".pipe-shape");
+    const broken = tile.querySelector(".broken-mark");
 
-  const shape = tile.querySelector(".pipe-shape");
-  const broken = tile.querySelector(".broken-mark");
+    if (!shape) return;
 
-  if (!shape) return;
+    shape.style.display = "block";
+    shape.style.position = "absolute";
+    shape.style.left = "50%";
+    shape.style.top = "50%";
+    shape.style.transform =
+        `translate(-50%, -50%) rotate(${pipe.rotation * 90}deg)`;
 
-  shape.style.dysplay = "block";
+    shape.style.width = "80px";
+    shape.style.height = "80px";
+    shape.style.boxSizing = "border-box";
+    shape.style.background = "transparent";
+    shape.style.border = "0";
+    shape.style.borderRadius = "0";
 
-  shape.style.display = "block";
-  shape.style.position = "absolute";
-  shape.style.boxSizing ="border-box";
-  shape.style.left = "50%";
-  shape.style.top = "50%";
-  shape.style.transform = `translate(-50%, -50%) rotate(${pipe.rotation * 90}deg)`;
+    const connections = pipe.correctConnections;
 
-  shape.style.width = "80px";
-  shape.style.height = "80px";
-  shape.style.background = "3px solid #61e8ff";
-  shape.style.borderRadius = "0 0 30px 0";
-
-  if (pipe.correctConnections.length === 2) {
-
+    // STRAIGHT: left + right
     if (
-      pipe.correctConnections.includes("left") &&
-      pipe.correctConnections.includes("right")
+        connections.includes("left") &&
+        connections.includes("right")
     ) {
-      shape.style.width = "80px";
-      shape.style.height = "18px";
+        shape.style.width = "80px";
+        shape.style.height = "18px";
+        shape.style.background = "#61e8ff";
+        shape.style.borderRadius = "9px";
     }
-  }
 
-  if (pipe.correctConnections.includes("left") &&
-      pipe.correctConnections.includes("bottom")) {
+    // STRAIGHT: top + bottom
+    else if (
+        connections.includes("top") &&
+        connections.includes("bottom")
+    ) {
+        shape.style.width = "18px";
+        shape.style.height = "80px";
+        shape.style.background = "#61e8ff";
+        shape.style.borderRadius = "9px";
+    }
 
-    shape.style.width = "80px";
-    shape.style.height = "80spx";
-    shape.style.borderRadius = "0 0 0 30px";
-    shape.style.background = "transparent";
-    shape.style.borderLeft = "18px solid #61e8ff";
-    shape.style.borderBottom = "18px solid #61e8ff";
-  }
+    // CORNER: left + bottom
+    else if (
+        connections.includes("left") &&
+        connections.includes("bottom")
+    ) {
+        shape.style.width = "80px";
+        shape.style.height = "80px";
+        shape.style.borderLeft = "18px solid #61e8ff";
+        shape.style.borderBottom = "18px solid #61e8ff";
+        shape.style.borderRadius = "0 0 0 30px";
+    }
 
-  if (pipe.correctConnections.includes("right") &&
-      pipe.correctConnections.includes("bottom")) {
+    // CORNER: right + bottom
+    else if (
+        connections.includes("right") &&
+        connections.includes("bottom")
+    ) {
+        shape.style.width = "80px";
+        shape.style.height = "80px";
+        shape.style.borderRight = "18px solid #61e8ff";
+        shape.style.borderBottom = "18px solid #61e8ff";
+        shape.style.borderRadius = "0 0 30px 0";
+    }
 
-    shape.style.width = "80px";
-    shape.style.height = "80px";
-    shape.style.borderRadius = "0 0 30px 0";
-    shape.style.background = "transparent";
-    shape.style.borderRight = "18px solid #61e8ff";
-    shape.style.borderBottom = "18px solid #61e8ff";
-  }
+    // CORNER: left + top
+    else if (
+        connections.includes("left") &&
+        connections.includes("top")
+    ) {
+        shape.style.width = "80px";
+        shape.style.height = "80px";
+        shape.style.borderLeft = "18px solid #61e8ff";
+        shape.style.borderTop = "18px solid #61e8ff";
+        shape.style.borderRadius = "30px 0 0 0";
+    }
 
-  if (pipe.correctConnections.includes("left") &&
-      pipe.correctConnections.includes("top")) {
+    // CORNER: right + top
+    else if (
+        connections.includes("right") &&
+        connections.includes("top")
+    ) {
+        shape.style.width = "80px";
+        shape.style.height = "80px";
+        shape.style.borderRight = "18px solid #61e8ff";
+        shape.style.borderTop = "18px solid #61e8ff";
+        shape.style.borderRadius = "0 30px 0 0";
+    }
 
-    shape.style.width = "80px";
-    shape.style.height = "80px";
-    shape.style.borderRadius = "0 0 30px 0";
-    shape.style.background = "transparent";
-    shape.style.borderLeft = "18px solid #61e8ff";
-    shape.style.borderTop = "18px solid #61e8ff";
-  }
+    if (broken) {
+        broken.style.position = "absolute";
+        broken.style.top = "3px";
+        broken.style.right = "4px";
+        broken.style.fontSize = "16px";
+    }
 
-  if (pipe.correctConnections.includes("right") &&
-      pipe.correctConnections.includes("top")) {
-
-    shape.style.width = "80px";
-    shape.style.height = "80px";
-    shape.style.borderRadius = "0 30px 0 0";
-    shape.style.background = "transparent";
-    shape.style.borderRight = "18px solid #61e8ff";
-    shape.style.borderTop = "18px solid #61e8ff";
-  }
-
-  if (broken) {
-    broken.style.position = "absolute";
-    broken.style.top = "3px";
-    broken.style.right = "4px";
-    broken.style.fontSize = "16px";
-  }
-
-  tile.style.boxShadow = "0 0 8px rgba(0,200,255,0.4)";
+    tile.style.boxShadow = "0 0 8px rgba(0, 220, 255, 0.4)";
 }
-
-// ------------------------------------------------------
-// ROTATE PIPE
-// ------------------------------------------------------
-
-function rotatePipe(index) {
-  if (!gameStarted || gameOver) return;
-
-  const pipe = pipes[index];
-
-  pipe.rotation = (pipe.rotation + 1) % 4;
-
-  moves++;
-  score += 10;
-
-  const tile = board.children[index];
-
-  // Rotate the actual pipe
-  updatePipeVisual(tile, pipe);
-
-  updateDisplays();
-  checkWaterFlow();
-}
-
   
 
 // ------------------------------------------------------
