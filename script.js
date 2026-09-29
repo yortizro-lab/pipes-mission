@@ -220,33 +220,46 @@ function rotatePipe(index) {
 }
 function checkWaterFlow() {
     const connected = new Set();
+
+    const firstPipe = pipes[0];
+
+    if (!firstPipe) return;
+
+    const firstConnections = getRotatedConnections(firstPipe);
+
+    // Faucet must connect to the TOP of the first pipe
+    if (!firstConnections.includes("top")) {
+        message.textContent = "🚰 Connect the first pipe to the faucet!";
+        return;
+    }
+
     const queue = [0];
+
+    const directions = {
+        top: [-1, 0],
+        right: [0, 1],
+        bottom: [1, 0],
+        left: [0, -1]
+    };
+
+    const opposite = {
+        top: "bottom",
+        right: "left",
+        bottom: "top",
+        left: "right"
+    };
 
     while (queue.length > 0) {
         const index = queue.shift();
 
         if (connected.has(index)) continue;
 
-        connected.add(index);
-
         const pipe = pipes[index];
         if (!pipe) continue;
 
+        connected.add(index);
+
         const connections = getRotatedConnections(pipe);
-
-        const directions = {
-            top: [-1, 0],
-            right: [0, 1],
-            bottom: [1, 0],
-            left: [0, -1]
-        };
-
-        const opposite = {
-            top: "bottom",
-            right: "left",
-            bottom: "top",
-            left: "right"
-        };
 
         for (const direction of connections) {
             const [dr, dc] = directions[direction];
@@ -270,13 +283,23 @@ function checkWaterFlow() {
         }
     }
 
-    // The last pipe is connected to the single water exit
-    if (connected.has(pipes.length - 1)) {
+    const lastIndex = pipes.length - 1;
+    const lastPipe = pipes[lastIndex];
+
+    // Exit must connect from the bottom of the last pipe
+    const reachesExit =
+        connected.has(lastIndex) &&
+        getRotatedConnections(lastPipe).includes("bottom");
+
+    if (reachesExit) {
         message.textContent = "💧 Water reached the exit!";
         gameOver = true;
         clearInterval(timer);
+    } else {
+        message.textContent = "🚰 Keep connecting the pipes!";
     }
-}
+}   
+
 // ------------------------------------------------------
 // FAUCET AND EXIT
 // ------------------------------------------------------
