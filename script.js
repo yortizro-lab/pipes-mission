@@ -130,7 +130,7 @@ function createBoard() {
   board.style.display = "grid";
   board.style.gridTemplateColumns = "repeat(3, 80px)";
   board.style.gridTemplateRows = "repeat(3, 80px)";
-  board.style.gap = "8px";
+  board.style.gap = "0px";
   board.style.justifyContent = "center";
   board.style.alignItems = "center";
   board.style.padding = "20px";
@@ -261,7 +261,7 @@ function updatePipeVisual(tile, pipe) {
   shape.style.transform = `translate(-50%, -50%) rotate(${pipe.rotation * 90}deg)`;
 
   shape.style.width = "18px";
-  shape.style.height = "60px";
+  shape.style.height = "80px";
   shape.style.background = "#61e8ff";
   shape.style.borderRadius = "10px";
 
@@ -271,7 +271,7 @@ function updatePipeVisual(tile, pipe) {
       pipe.correctConnections.includes("left") &&
       pipe.correctConnections.includes("right")
     ) {
-      shape.style.width = "60px";
+      shape.style.width = "80px";
       shape.style.height = "18px";
     }
   }
@@ -279,8 +279,8 @@ function updatePipeVisual(tile, pipe) {
   if (pipe.correctConnections.includes("left") &&
       pipe.correctConnections.includes("bottom")) {
 
-    shape.style.width = "55px";
-    shape.style.height = "55px";
+    shape.style.width = "80px";
+    shape.style.height = "80spx";
     shape.style.borderRadius = "0 0 0 30px";
     shape.style.background = "transparent";
     shape.style.borderLeft = "18px solid #61e8ff";
