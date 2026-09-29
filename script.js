@@ -49,7 +49,7 @@ function getSolutionConnections(index) {
     const current = solutionPath[index];
     const connections = [];
 
-    
+
     if (index > 0) {
         const previous = solutionPath[index - 1];
 
@@ -186,6 +186,7 @@ function createBoard() {
        });
 
       board.appendChild(tile);
+      updatePipeVisual(tile, pipe);
 
     }
   }
