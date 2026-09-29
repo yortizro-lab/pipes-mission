@@ -407,6 +407,23 @@ function startGame(){
   updateDisplays();
 
   startTimer();
+  function startTimer() {
+    clearInterval(timer);
+
+    timer = setInterval(() => {
+        if (!gameStarted || gameOver) return;
+
+        timeLeft--;
+        updateDisplays();
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            gameOver = true;
+            gameStarted = false;
+            message.textContent = "⏰ Time's up!";
+        }
+    }, 1000);
+}
 }
 
 startButton.addEventListener("click", startGame );
