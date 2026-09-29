@@ -252,13 +252,12 @@ function updatePipeVisual(tile, pipe) {
 
     if (!shape) return;
 
+    const connections = pipe.correctConnections;
+
     shape.style.display = "block";
     shape.style.position = "absolute";
     shape.style.left = "50%";
     shape.style.top = "50%";
-    shape.style.transform =
-        `translate(-50%, -50%) rotate(${pipe.rotation * 90}deg)`;
-
     shape.style.width = "80px";
     shape.style.height = "80px";
     shape.style.boxSizing = "border-box";
@@ -266,77 +265,76 @@ function updatePipeVisual(tile, pipe) {
     shape.style.border = "0";
     shape.style.borderRadius = "0";
 
-    const connections = pipe.correctConnections;
+    shape.style.transform =
+        `translate(-50%, -50%) rotate(${pipe.rotation * 90}deg)`;
 
-    // STRAIGHT: left + right
+    let path = "";
+
+    // LEFT + RIGHT
     if (
         connections.includes("left") &&
         connections.includes("right")
     ) {
-        shape.style.width = "80px";
-        shape.style.height = "18px";
-        shape.style.background = "#61e8ff";
-        shape.style.borderRadius = "9px";
+        path = "M 0 40 L 80 40";
     }
 
-    // STRAIGHT: top + bottom
+    // TOP + BOTTOM
     else if (
         connections.includes("top") &&
         connections.includes("bottom")
     ) {
-        shape.style.width = "18px";
-        shape.style.height = "80px";
-        shape.style.background = "#61e8ff";
-        shape.style.borderRadius = "9px";
+        path = "M 40 0 L 40 80";
     }
 
-    // CORNER: left + bottom
+    // LEFT + BOTTOM
     else if (
         connections.includes("left") &&
         connections.includes("bottom")
     ) {
-        shape.style.width = "80px";
-        shape.style.height = "80px";
-        shape.style.borderLeft = "18px solid #61e8ff";
-        shape.style.borderBottom = "18px solid #61e8ff";
-        shape.style.borderRadius = "0 0 0 30px";
+        path = "M 0 40 Q 40 40 40 80";
     }
 
-    // CORNER: right + bottom
+    // RIGHT + BOTTOM
     else if (
         connections.includes("right") &&
         connections.includes("bottom")
     ) {
-        shape.style.width = "80px";
-        shape.style.height = "80px";
-        shape.style.borderRight = "18px solid #61e8ff";
-        shape.style.borderBottom = "18px solid #61e8ff";
-        shape.style.borderRadius = "0 0 30px 0";
+        path = "M 80 40 Q 40 40 40 80";
     }
 
-    // CORNER: left + top
+    // LEFT + TOP
     else if (
         connections.includes("left") &&
         connections.includes("top")
     ) {
-        shape.style.width = "80px";
-        shape.style.height = "80px";
-        shape.style.borderLeft = "18px solid #61e8ff";
-        shape.style.borderTop = "18px solid #61e8ff";
-        shape.style.borderRadius = "30px 0 0 0";
+        path = "M 0 40 Q 40 40 40 0";
     }
 
-    // CORNER: right + top
+    // RIGHT + TOP
     else if (
         connections.includes("right") &&
         connections.includes("top")
     ) {
-        shape.style.width = "80px";
-        shape.style.height = "80px";
-        shape.style.borderRight = "18px solid #61e8ff";
-        shape.style.borderTop = "18px solid #61e8ff";
-        shape.style.borderRadius = "0 30px 0 0";
+        path = "M 80 40 Q 40 40 40 0";
     }
+
+    shape.innerHTML = `
+        <svg
+            width="80"
+            height="80"
+            viewBox="0 0 80 80"
+            style="display:block; overflow:visible;"
+        >
+            <path
+                d="${path}"
+                fill="none"
+                stroke="#61e8ff"
+                stroke-width="18"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+        </svg>
+    `;
 
     if (broken) {
         broken.style.position = "absolute";
@@ -345,159 +343,9 @@ function updatePipeVisual(tile, pipe) {
         broken.style.fontSize = "16px";
     }
 
-    tile.style.boxShadow = "0 0 8px rgba(0, 220, 255, 0.4)";
+    tile.style.boxShadow =
+        "0 0 8px rgba(0, 220, 255, 0.4)";
 }
-  
-
-// ------------------------------------------------------
-// CHECK WATER FLOW
-// ------------------------------------------------------
-
-function checkWaterFlow() {
- let connected = new Set();
-  let queue = [0];
-
-  while (queue.length > 0) {
-    const index = queue.shift();
-
-    if (connected.has(index)) continue;
-    connected.add(index);
-
-    const pipe = pipes[index];
-    const connections = getRotatedConnections(pipe);
-
-    const directions = {
-      top: [-1, 0],
-      right: [0, 1],
-      bottom: [1, 0],
-      left: [0, -1]
-    };
-
-    for (const direction of connections) {
-      const [dr, dc] = directions[direction];
-
-      const newRow = pipe.row + dr;
-      const newCol = pipe.col + dc;
-
-      if (
-        newRow < 0 ||
-        newRow >= SIZE ||
-        newCol < 0 ||
-        newCol >= SIZE
-      ) {
-        continue;
-      }
-
-      const nextIndex = newRow * SIZE + newCol;
-      const nextPipe = pipes[nextIndex];
-
-      if (!nextPipe) continue;
-
-      const opposite = {
-        top: "bottom",
-        right: "left",
-        bottom: "top",
-        left: "right"
-      };
-
-      const nextConnections =
-        getRotatedConnections(nextPipe);
-
-      if (nextConnections.includes(opposite[direction])) {
-        queue.push(nextIndex);
-      }
-    }
-  }
-
-  if (connected.has(8)) {
-    startWaterAnimation();
-  } else {
-    message.textContent =
-      "🔧 Keep fixing the broken pipes!";
-  }
-}
-
-
-
-
-  // All pipes are repaired
- 
-
-// ------------------------------------------------------
-// RUNNING WATER
-// ------------------------------------------------------
-
-function startWaterAnimation() {
-  if (gameOver) return;
-
-  message.textContent = "💧 Water is flowing through the repaired pipes!";
-
-  const water = document.createElement("div");
-
-  water.id = "runningWater";
-  water.innerHTML = "💧";
-
-  water.style.position = "fixed";
-  water.style.fontSize = "28px";
-  water.style.zIndex = "9999";
-  water.style.pointerEvents = "none";
-  water.style.transition = "all 0.45s linear";
-
-  document.body.appendChild(water);
-
-  const path = solutionPath.map(([row, col]) => {
-    return row * SIZE + col;
-  });
-
-  let step = 0;
-
-  function moveWater() {
-    const tile = board.children[path[step]];
-
-    if (!tile) return;
-
-    const rect = tile.getBoundingClientRect();
-
-    water.style.left =
-      `${rect.left + rect.width / 2 - 14}px`;
-
-    water.style.top =
-      `${rect.top + rect.height / 2 - 14}px`;
-
-    step++;
-
-    if (step < path.length) {
-      setTimeout(moveWater, 500);
-    } else {
-      setTimeout(() => {
-        water.remove();
-
-        score += 500;
-        updateDisplays();
-
-        message.textContent =
-          "🎉 Mission complete! The water reached the exit!";
-
-        gameOver = true;
-
-        if (timer) {
-          clearInterval(timer);
-        }
-      }, 600);
-    }
-  }
-
-  moveWater();
-}
-// ------------------------------------------------------
-// TIMER
-// ------------------------------------------------------
-
-function startTimer() {
-
-  if (timer) {
-    clearInterval(timer);
-  }
 
   timer = setInterval(() => {
 
@@ -519,7 +367,7 @@ function startTimer() {
     }
 
   }, 1000);
-}
+
 
 // ------------------------------------------------------
 // START GAME

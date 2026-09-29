@@ -126,6 +126,10 @@ main {
 }
 
 .game-faucet {
+  margin-bottom: -20px;
+}
+
+.game-faucet {
   font-size: 1.1rem;
 }
 
