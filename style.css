@@ -185,3 +185,15 @@ button#startButton:hover {
   align-content: center;
 }
 }
+/* WATER FLOW ANIMATION */
+.pipe-shape.water-active path {
+  stroke: #ffffff;
+  stroke-dasharray: 12 8;
+  animation: waterFlow 0.7s linear infinite;
+}
+
+@keyframes waterFlow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
