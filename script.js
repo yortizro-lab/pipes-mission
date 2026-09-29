@@ -290,8 +290,8 @@ function updatePipeVisual(tile, pipe) {
   if (pipe.correctConnections.includes("right") &&
       pipe.correctConnections.includes("bottom")) {
 
-    shape.style.width = "55px";
-    shape.style.height = "55px";
+    shape.style.width = "80px";
+    shape.style.height = "80px";
     shape.style.borderRadius = "0 0 30px 0";
     shape.style.background = "transparent";
     shape.style.borderRight = "18px solid #61e8ff";
@@ -312,8 +312,8 @@ function updatePipeVisual(tile, pipe) {
   if (pipe.correctConnections.includes("right") &&
       pipe.correctConnections.includes("top")) {
 
-    shape.style.width = "55px";
-    shape.style.height = "55px";
+    shape.style.width = "80px";
+    shape.style.height = "80px";
     shape.style.borderRadius = "0 30px 0 0";
     shape.style.background = "transparent";
     shape.style.borderRight = "18px solid #61e8ff";
