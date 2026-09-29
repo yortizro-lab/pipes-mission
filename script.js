@@ -176,7 +176,7 @@ function createBoard() {
 
     }
   }
-
+}
   addWaterMarkers();
 
 
