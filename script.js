@@ -35,11 +35,9 @@ let pipes = [];
 //              pipe → pipe → EXIT
 const solutionPath = [
   [0, 0],
-  [0, 0],
   [1, 0],
   [1, 1],
   [1, 2],
-  [2, 2],
   [2, 2],
 ];
 
@@ -105,7 +103,22 @@ function getPipeType(connections) {
 
   return "corner";
 }
+function getRotatedConnections(pipe) {
+  let connections = [...pipe.correctConnections];
 
+  const rotationMap = {
+    top: "right",
+    right: "bottom",
+    bottom: "left",
+    left: "top"
+  };
+
+  for (let i = 0; i < pipe.rotation; i++) {
+    connections = connections.map(direction => rotationMap[direction]);
+  }
+
+  return connections;
+}
 // ------------------------------------------------------
 // CREATE BOARD
 // ------------------------------------------------------
