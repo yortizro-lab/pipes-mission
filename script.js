@@ -296,6 +296,14 @@ function addWaterMarkers() {
     <div style="font-size:40px;">🚰</div>
     <strong>FAUCET</strong>
   `;
+  faucet.style.cursor = "pointer";
+
+faucet.addEventListener("click", () => {
+    if (!gameStarted || gameOver) return;
+
+    message.textContent = "💧 Water is flowing!";
+    checkWaterFlow();
+});
 
   faucet.style.textAlign = "center";
   faucet.style.margin = "0px auto";
