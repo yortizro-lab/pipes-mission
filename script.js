@@ -301,9 +301,9 @@ function updatePipeVisual(tile, pipe) {
   if (pipe.correctConnections.includes("left") &&
       pipe.correctConnections.includes("top")) {
 
-    shape.style.width = "55px";
-    shape.style.height = "55px";
-    shape.style.borderRadius = "30px 0 0 0";
+    shape.style.width = "80px";
+    shape.style.height = "80px";
+    shape.style.borderRadius = "0 0 30px 0";
     shape.style.background = "transparent";
     shape.style.borderLeft = "18px solid #61e8ff";
     shape.style.borderTop = "18px solid #61e8ff";
