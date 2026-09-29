@@ -150,6 +150,10 @@ function createBoard() {
         connections = ["top", "bottom"];
       }
 
+      if (pathIndex === -1) {
+         continue;
+      }
+
       const type = getPipeType(connections);
 
       const pipe = {
