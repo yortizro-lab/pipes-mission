@@ -49,7 +49,7 @@ function getSolutionConnections(index) {
     const current = solutionPath[index];
     const connections = [];
 
-    // Connection to the previous pipe
+    
     if (index > 0) {
         const previous = solutionPath[index - 1];
 
