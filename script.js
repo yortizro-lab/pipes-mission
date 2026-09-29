@@ -330,11 +330,21 @@ faucet.addEventListener("click", () => {
 
   faucet.style.textAlign = "center";
   faucet.style.width = "80px";
-  faucet.style.margin = "0px 0px 0px calc((100% - 240) / 2)";
+  faucet.style.margin = "0";
   faucet.style.color = "white";
   faucet.style.transform ="none";
 
   board.parentElement.insertBefore(faucet, board);
+
+ const system = board.parentElement;
+system.style.position = "relative";
+
+const boardRect = board.getBoundingClientRect();
+const systemRect = system.getBoundingClientRect();
+
+faucet.style.position = "absolute";
+faucet.style.left = (boardRect.left - systemRect.left) + "px";
+faucet.style.top = (boardRect.top - systemRect.top - 75) + "px"; 
 
   const exit = document.createElement("div");
 
