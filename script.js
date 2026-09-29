@@ -174,8 +174,6 @@ function createBoard() {
 
       board.appendChild(tile);
 
-      updatePipeVisual(tile, pipe);
-      }
     }
   }
 
