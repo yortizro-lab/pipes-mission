@@ -287,11 +287,14 @@ function checkWaterFlow() {
     const lastPipe = pipes[lastIndex];
 
     // Exit must connect from the bottom of the last pipe
-    const reachesExit =
-        connected.has(lastIndex) &&
-        getRotatedConnections(lastPipe).includes("bottom");
+   const lastIndex = pipes.length - 1;
+const lastPipe = pipes[lastIndex];
 
-    if (reachesExit) {
+const reachesExit =
+    connected.has(lastIndex) &&
+    getRotatedConnections(lastPipe).includes("bottom");
+
+if (reachesExit) {
     message.textContent = "💧 Water is flowing to the exit!";
 
     connected.forEach(index => {
@@ -310,68 +313,7 @@ function checkWaterFlow() {
     clearInterval(timer);
 } else {
     message.textContent = "🚰 Keep connecting the pipes!";
-}
-
-// ------------------------------------------------------
-// FAUCET AND EXIT
-// ------------------------------------------------------
-
-function addWaterMarkers() {
-
-  const oldMarkers = document.querySelectorAll(
-    ".game-faucet, .game-exit"
-  );
-
-  oldMarkers.forEach(marker => marker.remove());
-
-  const faucet = document.createElement("div");
-
-  faucet.className = "game-faucet";
-  faucet.innerHTML = `
-    <div style="font-size:40px;">🚰</div>
-    <strong>FAUCET</strong>
-  `;
-  faucet.style.cursor = "pointer";
-
-faucet.addEventListener("click", () => {
-    if (!gameStarted || gameOver) return;
-
-    message.textContent = "💧 Water is flowing!";
-    checkWaterFlow();
-});
-
-  faucet.style.textAlign = "center";
-  faucet.style.width = "80px";
-  faucet.style.margin = "0";
-  faucet.style.color = "white";
-  faucet.style.transform ="none";
-
-  board.parentElement.insertBefore(faucet, board);
-
- const system = board.parentElement;
-system.style.position = "relative";
-
-const boardRect = board.getBoundingClientRect();
-const systemRect = system.getBoundingClientRect();
-
-faucet.style.position = "absolute";
-faucet.style.left = (boardRect.left - systemRect.left + 80) + "px";
-faucet.style.top = (boardRect.top - systemRect.top - 75) + "px"; 
-
-  const exit = document.createElement("div");
-
-  exit.className = "game-exit";
-  exit.innerHTML = `
-    <div style="font-size:40px;">💧</div>
-    <strong>WATER EXIT</strong>
-  `;
-
-  exit.style.textAlign = "center";
-  exit.style.margin = "0px auto";
-  exit.style.color = "white";
-
-  board.parentElement.appendChild(exit);
-}
+} 
 
 // ------------------------------------------------------
 // PIPE VISUAL
