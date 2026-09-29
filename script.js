@@ -173,6 +173,7 @@ function createBoard() {
 
       tile.style.width = "80px";
       tile.style.height = "80px";
+      tile.style.boxSizing = "border-box";
       tile.style.gridRow = row + 1;
       tile.style.gridColumn = col + 1;
       tile.style.position = "relative";
@@ -256,14 +257,15 @@ function updatePipeVisual(tile, pipe) {
 
   shape.style.display = "block";
   shape.style.position = "absolute";
+  shape.style.boxSizing ="border-box";
   shape.style.left = "50%";
   shape.style.top = "50%";
   shape.style.transform = `translate(-50%, -50%) rotate(${pipe.rotation * 90}deg)`;
 
-  shape.style.width = "18px";
+  shape.style.width = "80px";
   shape.style.height = "80px";
-  shape.style.background = "#61e8ff";
-  shape.style.borderRadius = "10px";
+  shape.style.background = "3px solid #61e8ff";
+  shape.style.borderRadius = "0 0 30px 0";
 
   if (pipe.correctConnections.length === 2) {
 
