@@ -343,7 +343,7 @@ const boardRect = board.getBoundingClientRect();
 const systemRect = system.getBoundingClientRect();
 
 faucet.style.position = "absolute";
-faucet.style.left = (boardRect.left - systemRect.left) + "px";
+faucet.style.left = (boardRect.left - systemRect.left + 80) + "px";
 faucet.style.top = (boardRect.top - systemRect.top - 75) + "px"; 
 
   const exit = document.createElement("div");
