@@ -160,7 +160,7 @@ function createBoard() {
         row: row,
         col: col,
         correctConnections: connections,
-        rotation: Math.floor(Math.random() * 4),
+        rotation: 0,
         fixed: false
       };
 
@@ -173,6 +173,8 @@ function createBoard() {
 
       tile.style.width = "80px";
       tile.style.height = "80px";
+      tile.style.gridRow = row + 1;
+      tile.style.gridColumn = col + 1;
       tile.style.position = "relative";
       tile.style.border = "3px solid #36d1ff";
       tile.style.borderRadius = "12px";
