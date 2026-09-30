@@ -1,21 +1,14 @@
-/**
- * Pipes Mission - Multi-Level Game Logic with Bucket Progress & Pipe Repair
- */
-
-// --- Game Levels Definition ---
 const LEVELS = [
-  // LEVEL 1: Simple 3x3 layout, no broken pipes, easy intro
+  // LEVEL 1: Easy 3x3 layout
   {
     levelNumber: 1,
     rows: 3,
     cols: 3,
     time: 120,
-    movesAllowed: 10,
-    targetBucketPos: { row: 2, col: 2 },
     sourcePos: { row: 0, col: 1 },
     grid: [
       { row: 0, col: 0, type: 'corner', rot: 90, broken: false },
-      { row: 0, col: 1, type: 'straight', rot: 90, broken: false }, // Faucet input
+      { row: 0, col: 1, type: 'straight', rot: 90, broken: false },
       { row: 0, col: 2, type: 'corner', rot: 180, broken: false },
 
       { row: 1, col: 0, type: 'straight', rot: 0, broken: false },
@@ -24,18 +17,16 @@ const LEVELS = [
 
       { row: 2, col: 0, type: 'corner', rot: 0, broken: false },
       { row: 2, col: 1, type: 'straight', rot: 90, broken: false },
-      { row: 2, col: 2, type: 'bucket', rot: 0, broken: false } // Target Bucket
+      { row: 2, col: 2, type: 'bucket', rot: 0, broken: false }
     ]
   },
  
-  // LEVEL 2: 3x3 layout introducing broken pipes
+  // LEVEL 2: 3x3 introducing broken pipes
   {
     levelNumber: 2,
     rows: 3,
     cols: 3,
     time: 110,
-    movesAllowed: 12,
-    targetBucketPos: { row: 2, col: 2 },
     sourcePos: { row: 0, col: 1 },
     grid: [
       { row: 0, col: 0, type: 'corner', rot: 0, broken: false },
@@ -52,14 +43,12 @@ const LEVELS = [
     ]
   },
 
-  // LEVEL 3: Full 4x3 layout (The original challenge)
+  // LEVEL 3: 4x3 Grid Challenge
   {
     levelNumber: 3,
     rows: 3,
     cols: 4,
     time: 102,
-    movesAllowed: 15,
-    targetBucketPos: { row: 2, col: 2 },
     sourcePos: { row: 0, col: 1 },
     grid: [
       { row: 0, col: 0, type: 'corner', rot: 90, broken: false },
@@ -80,12 +69,12 @@ const LEVELS = [
   }
 ];
 
-// --- Global State ---
-let currentLevelIndex = 0;
+let currentLevelIdx = 0;
 let moves = 0;
 let targetPercent = 0;
 let timeLeft = 0;
 let timerInterval = null;
+let isPaused = false;
 let gridState = [];
 
 const PIPE_TYPES = {
@@ -102,30 +91,27 @@ const DIRECTIONS = {
   W: { row: 0, col: -1, opposite: 'E' }
 };
 
-// --- Level Controls ---
-
-function loadLevel(levelIdx) {
-  if (levelIdx >= LEVELS.length) {
-    alert("🎉 Congratulations! You have completed all levels!");
-    levelIdx = 0; // Restart from Level 1
+function loadLevel(idx) {
+  if (idx >= LEVELS.length) {
+    alert("🎉 Fantastic! You completed all levels!");
+    idx = 0;
   }
 
-  currentLevelIndex = levelIdx;
-  const currentLevel = LEVELS[currentLevelIndex];
-
-  // Deep clone level grid to prevent mutating template data
+  currentLevelIdx = idx;
+  const currentLevel = LEVELS[currentLevelIdx];
   gridState = JSON.parse(JSON.stringify(currentLevel.grid));
+
   moves = 0;
   targetPercent = 0;
   timeLeft = currentLevel.time;
+  isPaused = false;
 
-  // Update UI Elements
-  const titleEl = document.querySelector('.level-title');
+  // Header update
+  const titleEl = document.getElementById('level-title');
   if (titleEl) titleEl.textContent = `LEVEL ${currentLevel.levelNumber} — PIPE REPAIR`;
-
+ 
   document.getElementById('moves').textContent = moves;
 
-  // Set CSS grid dynamic column count for varying layout sizes
   const gridContainer = document.getElementById('grid');
   if (gridContainer) {
     gridContainer.style.gridTemplateColumns = `repeat(${currentLevel.cols}, 1fr)`;
@@ -137,15 +123,13 @@ function loadLevel(levelIdx) {
   renderGrid();
 }
 
-/** Calculates pipe direction openings based on angle */
 function getTileOpenings(tile) {
   if (tile.broken || tile.type === 'bucket') return [];
- 
-  const baseOpenings = PIPE_TYPES[tile.type] || [];
+  const base = PIPE_TYPES[tile.type] || [];
   const shift = (tile.rot / 90) % 4;
   const dirOrder = ['N', 'E', 'S', 'W'];
 
-  return baseOpenings.map(dir => {
+  return base.map(dir => {
     let index = (dirOrder.indexOf(dir) + shift) % 4;
     return dirOrder[index];
   });
@@ -155,15 +139,13 @@ function canConnect(tileA, tileB, directionKey) {
   const openingsA = getTileOpenings(tileA);
   const openingsB = getTileOpenings(tileB);
   const oppDir = DIRECTIONS[directionKey].opposite;
-
   return openingsA.includes(directionKey) && openingsB.includes(oppDir);
 }
 
-/** Pathfinding to check water path */
 function evaluateWaterFlow() {
-  const currentLevel = LEVELS[currentLevelIndex];
-  const sourceTile = gridState.find(t => t.row === currentLevel.sourcePos.row && t.col === currentLevel.sourcePos.col);
- 
+  const level = LEVELS[currentLevelIdx];
+  const sourceTile = gridState.find(t => t.row === level.sourcePos.row && t.col === level.sourcePos.col);
+
   gridState.forEach(t => { t.filled = false; t.leaking = false; });
 
   if (!sourceTile || sourceTile.broken) {
@@ -209,16 +191,17 @@ function evaluateWaterFlow() {
   targetPercent = reachesBucket ? 100 : Math.min(75, visited.size * 20);
   updateProgressUI(targetPercent);
 
-  // Check level completion
   if (reachesBucket && targetPercent === 100) {
     setTimeout(() => {
-      alert(`Level ${LEVELS[currentLevelIndex].levelNumber} Complete! Moving to next level...`);
-      loadLevel(currentLevelIndex + 1);
-    }, 400);
+      alert(`Level ${LEVELS[currentLevelIdx].levelNumber} Complete!`);
+      loadLevel(currentLevelIdx + 1);
+    }, 300);
   }
 }
 
 function handleTileClick(index) {
+  if (isPaused) return;
+
   const tile = gridState[index];
   if (tile.type === 'bucket') return;
 
@@ -248,26 +231,26 @@ function updateProgressUI(pct) {
 function renderGrid() {
   const gridContainer = document.getElementById('grid');
   if (!gridContainer) return;
- 
+
   gridContainer.innerHTML = '';
 
   gridState.forEach((tile, idx) => {
     const tileEl = document.createElement('div');
-   
+
     if (tile.type === 'bucket') {
       tileEl.className = 'bucket';
       tileEl.innerHTML = `
         <div class="bucket-water" id="bucket-water" style="height:${targetPercent}%"></div>
-        <div class="bucket-label">COLLECTION BUCKET</div>
+        <div class="bucket-label">BUCKET</div>
       `;
     } else {
       tileEl.className = `tile ${tile.broken ? 'broken' : ''} ${tile.leaking ? 'leaking' : ''}`;
-     
+
       const pipeEl = document.createElement('div');
       pipeEl.className = `pipe ${tile.filled ? 'active' : ''}`;
       pipeEl.style.transform = `rotate(${tile.rot}deg)`;
 
-      if (tile.type === 'straight') pipeEl.innerHTML = `<div class="pipe-inner pipe-straight"></div>`;
+      if (tile.type === 'straight') pipeEl.innerHTML = `<div class="pipe-straight"></div>`;
       if (tile.type === 'corner') pipeEl.innerHTML = `<div class="pipe-corner"></div>`;
       if (tile.type === 'cross') pipeEl.innerHTML = `<div class="pipe-cross"></div>`;
 
@@ -283,21 +266,42 @@ function renderGrid() {
 
 function startTimer() {
   timerInterval = setInterval(() => {
-    if (timeLeft > 0) {
+    if (!isPaused && timeLeft > 0) {
       timeLeft--;
       let mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
       let secs = (timeLeft % 60).toString().padStart(2, '0');
       const timerEl = document.getElementById('timer');
       if (timerEl) timerEl.textContent = `${mins}:${secs}`;
-    } else {
+    } else if (timeLeft === 0) {
       clearInterval(timerInterval);
-      alert("Time's up! Reloading level...");
-      loadLevel(currentLevelIndex);
+      alert("Time's up! Restarting level...");
+      loadLevel(currentLevelIdx);
     }
   }, 1000);
 }
 
-// --- Init Game on Level 1 ---
+// Attach Top Button Listeners
+function setupControls() {
+  document.getElementById('btn-back')?.addEventListener('click', () => {
+    loadLevel(currentLevelIdx); // Restart level
+  });
+
+  document.getElementById('btn-pause')?.addEventListener('click', () => {
+    isPaused = !isPaused;
+    alert(isPaused ? "Game Paused" : "Game Resumed");
+  });
+
+  document.getElementById('btn-hint')?.addEventListener('click', () => {
+    alert("💡 Hint: Click cracked tiles to repair them first, then rotate them from top to bottom.");
+  });
+
+  document.getElementById('btn-settings')?.addEventListener('click', () => {
+    alert("⚙️️ Settings: Turn off audio or restart level from here.");
+  });
+}
+
+// Initializing Game
 document.addEventListener('DOMContentLoaded', () => {
-  loadLevel(0); // Starts game on Level 1
+  setupControls();
+  loadLevel(0); // Forces start at Level 1
 });
