@@ -3,63 +3,367 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pipes Mission</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+  <title>Level 3 - Pipe Repair</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+      background: #aadaf7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .game-card {
+      width: 420px;
+      background: #3a82ce;
+      border: 4px solid #1c5296;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+    }
+    .btn-icon {
+      background: #1c5296;
+      border: 2px solid #5fa4f0;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #123766;
+    }
+    .level-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-shadow: 2px 2px 0px #123766;
+    }
+    .top-controls {
+      display: flex;
+      gap: 6px;
+    }
 
+    /* Stats Panel */
+    .stats-panel {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .stat-box {
+      background: white;
+      border-radius: 12px;
+      padding: 6px 12px;
+      flex: 1;
+      border: 2px solid #1c5296;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #1c5296;
+      text-transform: uppercase;
+    }
+    .stat-value {
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: #0d2847;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #d8e5f2;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #2a9df4;
+      transition: width 0.3s ease;
+    }
+
+    /* Grid Area */
+    .board-container {
+      background: #e9dcc9;
+      border: 4px solid #b39b7d;
+      border-radius: 16px;
+      padding: 10px;
+      position: relative;
+    }
+    .faucet {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.2rem;
+      z-index: 10;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 15px;
+    }
+    .tile {
+      aspect-ratio: 1;
+      background: #ded0ba;
+      border: 2px solid #c2b198;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    .tile:active { transform: scale(0.95); }
+
+    /* Pipes Visualization */
+    .pipe {
+      width: 70%;
+      height: 70%;
+      position: relative;
+      transition: transform 0.2s ease-out;
+    }
+    .pipe-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      background: #8e9ca8;
+      position: relative;
+    }
+    .pipe.active .pipe-inner {
+      background: #2a9df4 !important;
+      box-shadow: 0 0 8px #2a9df4;
+    }
+    .pipe-straight { width: 35%; height: 100%; margin: 0 auto; }
+    .pipe-corner {
+      width: 65%;
+      height: 65%;
+      border-bottom: 14px solid #8e9ca8;
+      border-right: 14px solid #8e9ca8;
+      border-bottom-right-radius: 20px;
+      position: absolute;
+      bottom: 15%;
+      right: 15%;
+    }
+    .pipe.active .pipe-corner {
+      border-color: #2a9df4 !important;
+      box-shadow: 2px 2px 8px #2a9df4;
+    }
+    .pipe-cross {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pipe-cross::before, .pipe-cross::after {
+      content: ''; position: absolute; background: #8e9ca8;
+    }
+    .pipe-cross::before { width: 35%; height: 100%; }
+    .pipe-cross::after { width: 100%; height: 35%; }
+    .pipe.active .pipe-cross::before, .pipe.active .pipe-cross::after {
+      background: #2a9df4 !important;
+    }
+
+    /* Broken/Fixed State */
+    .tile.broken .pipe-inner, .tile.broken .pipe-corner {
+      background: #626a70 !important;
+      border-color: #626a70 !important;
+      filter: drop-shadow(0px 0px 2px red);
+    }
+    .leak-effect {
+      position: absolute;
+      font-size: 0.8rem;
+      animation: splash 0.5s infinite alternate;
+      display: none;
+    }
+    .tile.leaking .leak-effect { display: block; }
+
+    @keyframes splash {
+      0% { transform: scale(0.8); opacity: 0.7; }
+      100% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Bucket */
+    .bucket {
+      grid-column: 3;
+      grid-row: 3;
+      background: #8b5a2b;
+      border-radius: 0 0 15px 15px;
+      border: 3px solid #5c3a1b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .bucket-water {
+      position: absolute;
+      bottom: 0; width: 100%; height: 0%;
+      background: #2a9df4;
+      transition: height 0.4s ease;
+    }
+    .bucket-label {
+      position: relative; z-index: 2;
+      font-size: 0.6rem; color: white; font-weight: bold;
+    }
+  </style>
+</head>
 <body>
 
-  <header class="header">
-    <h1>💧 Pipes Mission</h1>
-    <p>Every drop counts!</p>
-  </header>
+<div class="game-card">
+  <!-- Header -->
+  <div class="header-bar">
+    <button class="btn-icon">←</button>
+    <div class="level-title">LEVEL 3 — PIPE REPAIR</div>
+    <div class="top-controls">
+      <button class="btn-icon">⏸</button>
+      <button class="btn-icon">💡</button>
+      <button class="btn-icon">⚙</button>
+    </div>
+  </div>
 
-  <main>
-    <section class="game-card">
-
-      <h2>Fix the Pipes</h2>
-
-      <p class="instructions">
-        Repair the broken pipes and connect the faucet to the water exit!
-      </p>
-
-      <div class="stats">
-        <div>
-          🏆 Score
-          <strong id="score">0</strong>
-        </div>
-
-        <div>
-          ⭐ Level
-          <strong id="level">1</strong>
-        </div>
-
-        <div>
-          🔄 Moves
-          <strong id="moves">0</strong>
-        </div>
+  <!-- Stats Dashboard -->
+  <div class="stats-panel">
+    <div class="stat-box">
+      <div class="stat-label">Target</div>
+      <div class="stat-value">FILL BUCKET <span id="target-pct">0%</span></div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
       </div>
+    </div>
+    <div class="stat-box" style="max-width: 110px;">
+      <div class="stat-label">Time</div>
+      <div class="stat-value" id="timer">01:42</div>
+      <div class="stat-label" style="margin-top:2px;">Moves: <span id="moves">0</span>/15</div>
+    </div>
+  </div>
 
-      <div class="timer">
-        ⏱️ Time: <span id="timer">30</span>
-      </div>
+  <!-- Board Container -->
+  <div class="board-container">
+    <div class="faucet">🚰</div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
 
-      <button id="startButton">💧 START</button>
+<script>
+  // Game State
+  let moves = 0;
+  let targetFilled = 0;
+  let timeLeft = 102; // 1 min 42 sec
+ 
+  // Grid layout (4x3 matrix matching puzzle layout)
+  // Types: 'straight', 'corner', 'cross', 'bucket'
+  const boardData = [
+    { type: 'corner', rot: 90, broken: false },
+    { type: 'straight', rot: 0, broken: false }, // Faucet input at col 2
+    { type: 'straight', rot: 0, broken: true },
+    { type: 'corner', rot: 180, broken: true },
+   
+    { type: 'corner', rot: 0, broken: true },
+    { type: 'straight', rot: 90, broken: true },
+    { type: 'cross', rot: 0, broken: false },
+    { type: 'corner', rot: 270, broken: false },
 
-      <div id="waterSystem">
+    { type: 'corner', rot: 270, broken: false },
+    { type: 'straight', rot: 90, broken: false },
+    { type: 'bucket', rot: 0, broken: false },
+    { type: 'corner', rot: 180, broken: false }
+  ];
 
+  const gridEl = document.getElementById('grid');
 
-        <div id="pipeBoard"></div>
+  function renderBoard() {
+    gridEl.innerHTML = '';
+    boardData.forEach((tile, idx) => {
+      const tileEl = document.createElement('div');
+      tileEl.className = `tile ${tile.broken ? 'broken' : ''}`;
 
-        <div id="waterFlow"></div>
+      if (tile.type === 'bucket') {
+        tileEl.className = 'bucket';
+        tileEl.innerHTML = `
+          <div class="bucket-water" id="bucket-water"></div>
+          <div class="bucket-label">BUCKET</div>
+        `;
+      } else {
+        const pipe = document.createElement('div');
+        pipe.className = `pipe`;
+        pipe.style.transform = `rotate(${tile.rot}deg)`;
+       
+        if (tile.type === 'straight') pipe.innerHTML = `<div class="pipe-inner pipe-straight"></div>`;
+        if (tile.type === 'corner') pipe.innerHTML = `<div class="pipe-corner"></div>`;
+        if (tile.type === 'cross') pipe.innerHTML = `<div class="pipe-cross"></div>`;
+       
+        tileEl.appendChild(pipe);
+        tileEl.innerHTML += `<div class="leak-effect">💦</div>`;
 
+        tileEl.addEventListener('click', () => handleTileClick(idx));
+      }
 
-      <p id="message"></p>
+      gridEl.appendChild(tileEl);
+    });
+  }
 
-    </section>
-  </main>
+  function handleTileClick(index) {
+    const tile = boardData[index];
+   
+    // If pipe is broken, fix it on first click; otherwise rotate it 90 degrees
+    if (tile.broken) {
+      tile.broken = false;
+    } else {
+      tile.rot = (tile.rot + 90) % 360;
+    }
+   
+    moves++;
+    document.getElementById('moves').textContent = moves;
+   
+    evaluateFlow();
+    renderBoard();
+  }
 
-  <script src="script.js"></script>
+  function evaluateFlow() {
+    // Basic solver evaluation simulation
+    let connected = boardData[1].rot % 180 === 0 && !boardData[1].broken;
+   
+    if (connected) {
+      targetFilled = Math.min(100, targetFilled + 25);
+    } else {
+      targetFilled = Math.max(0, targetFilled - 10);
+    }
 
+    document.getElementById('target-pct').textContent = `${targetFilled}%`;
+    document.getElementById('progress-fill').style.width = `${targetFilled}%`;
+   
+    const bucketWater = document.getElementById('bucket-water');
+    if (bucketWater) bucketWater.style.height = `${targetFilled}%`;
+  }
+
+  // Timer Countdown
+  setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      let mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      let secs = (timeLeft % 60).toString().padStart(2, '0');
+      document.getElementById('timer').textContent = `${mins}:${secs}`;
+    }
+  }, 1000);
+
+  renderBoard();
+</script>
 </body>
 </html>

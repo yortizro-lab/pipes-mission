@@ -1,199 +1,289 @@
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
 }
 
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0077b6, #00b4d8);
-  color: white;
-  text-align: center;
-}
-
-header {
-  background: #023e8a;
-  padding: 25px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 2.5rem;
-}
-
-header p {
-  font-size: 1.2rem;
-}
-
-main {
-  padding: 30px 15px;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+  background: #aadaf7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .game-card {
-  max-width: 900px;
-  margin: auto;
-  background: rgba(0, 40, 90, 0.8);
-  padding: 30px;
-  border-radius: 25px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  width: 420px;
+  background: #3a82ce;
+  border: 4px solid #1c5296;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.game-card h2 {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
+/* Header Bar */
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
 }
 
-#waterSystem {
-  margin: 20px auto;
-  font-size: 1.2rem;
-}
-
-#pipeBoard {
- display: grid !important;
-  grid-template-columns: repeat(3, 65px) !important;
-  grid-template-rows: repeat(3, 65px) !important;
-  gap: 8px !important;
-
-  width: fit-content !important;
-  min-height: 0 !important;
-
-  margin: 20px auto !important;
-  padding: 0 !important;
-
-  justify-content: center !important;
-  align-content: center !important;
-
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-}
-
-.pipe-tile {
-  width: 65px !important;
-  height: 65px !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  position: relative !important;
-
-  border: none !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-
-  cursor: pointer !important;
-  padding: 0 !important;
-}
-
-
-
-.pipe-tile.fixed {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.broken-mark {
-  position: absolute !important;
-  top: 3px !important;
-  right: 5px !important;
-
-  font-size: 15px !important;
-  z-index: 5;
-}
-
-.pipe-shape {
-   display: block;
-   position:absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 18px;
-  height: 60 px;
-
-  background: #61e8ff;
+.btn-icon {
+  background: #1c5296;
+  border: 2px solid #5fa4f0;
+  color: white;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-
- 
-  transform-origin: center center;
-}
-
-.game-faucet,
-.game-exit {
-  text-align: center;
-  margin: 5px auto;
-  color: white;
-}
-
-.game-faucet {
-  margin-bottom: -20px;
-}
-
-.game-faucet {
-  font-size: 1.1rem;
-}
-
-.game-exit {
-  font-size: 1.1rem;
-}
-
-#message {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin: 20px;
-}
-
-button#startButton {
-  background: #00b4d8;
-  color: white;
-
-  border: none;
-  padding: 14px 28px;
-
-  font-size: 1.1rem;
-  font-weight: bold;
-
-  border-radius: 12px;
-
-  cursor: pointer;
-}
-
-button#startButton:hover {
-  background: #48cae4;
-}
-
-#runningWater {
-  pointer-events: none;
-}
-
-@media (max-width: 600px) {
-
-  .game-card {
-    padding: 20px 10px;
-  }
-
-  #pipeBoard {
-  display: grid;
-  grid-template-columns: repeat(3, 65px);
-  grid-template-rows: repeat(3, 65px);
-  gap: 8px;
-  width: 211px;
-  height: 211px;
-  margin: 25px auto;
-  padding: 8px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-content: center;
-}
-}
-/* WATER FLOW ANIMATION */
-.pipe-shape.water-active path {
-  stroke: #ffffff;
-  stroke-dasharray: 12 8;
-  animation: waterFlow 0.7s linear infinite;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #123766;
+  touch-action: manipulation;
 }
 
-@keyframes waterFlow {
-  to {
-    stroke-dashoffset: -20;
+.level-title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-shadow: 2px 2px 0px #123766;
+}
+
+.top-controls {
+  display: flex;
+  gap: 6px;
+}
+
+/* Stats Panel */
+.stats-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stat-box {
+  background: white;
+  border-radius: 12px;
+  padding: 6px 12px;
+  flex: 1;
+  border: 2px solid #1c5296;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #1c5296;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #0d2847;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: #d8e5f2;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #2a9df4;
+  transition: width 0.3s ease;
+}
+
+/* Board Container */
+.board-container {
+  background: #e9dcc9;
+  border: 4px solid #b39b7d;
+  border-radius: 16px;
+  padding: 10px;
+  position: relative;
+}
+
+.faucet {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.2rem;
+  z-index: 10;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 15px;
+}
+
+/* Tiles & Touch Controls */
+.tile {
+  aspect-ratio: 1;
+  background: #ded0ba;
+  border: 2px solid #c2b198;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tile:active {
+  transform: scale(0.95);
+}
+
+/* Pipe Visuals */
+.pipe {
+  width: 70%;
+  height: 70%;
+  position: relative;
+  transition: transform 0.2s ease-out;
+}
+
+.pipe-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: #8e9ca8;
+  position: relative;
+}
+
+.pipe.active .pipe-inner {
+  background: #2a9df4 !important;
+  box-shadow: 0 0 8px #2a9df4;
+}
+
+.pipe-straight {
+  width: 35%;
+  height: 100%;
+  margin: 0 auto;
+}
+
+.pipe-corner {
+  width: 65%;
+  height: 65%;
+  border-bottom: 14px solid #8e9ca8;
+  border-right: 14px solid #8e9ca8;
+  border-bottom-right-radius: 20px;
+  position: absolute;
+  bottom: 15%;
+  right: 15%;
+}
+
+.pipe.active .pipe-corner {
+  border-color: #2a9df4 !important;
+  box-shadow: 2px 2px 8px #2a9df4;
+}
+
+.pipe-cross {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pipe-cross::before,
+.pipe-cross::after {
+  content: '';
+  position: absolute;
+  background: #8e9ca8;
+}
+
+.pipe-cross::before {
+  width: 35%;
+  height: 100%;
+}
+
+.pipe-cross::after {
+  width: 100%;
+  height: 35%;
+}
+
+.pipe.active .pipe-cross::before,
+.pipe.active .pipe-cross::after {
+  background: #2a9df4 !important;
+}
+
+/* Broken & Leak States */
+.tile.broken .pipe-inner,
+.tile.broken .pipe-corner {
+  background: #626a70 !important;
+  border-color: #626a70 !important;
+  filter: drop-shadow(0px 0px 2px red);
+}
+
+.leak-effect {
+  position: absolute;
+  font-size: 0.8rem;
+  animation: splash 0.5s infinite alternate;
+  display: none;
+}
+
+.tile.leaking .leak-effect {
+  display: block;
+}
+
+@keyframes splash {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
   }
+  100% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Bucket Element */
+.bucket {
+  grid-column: 3;
+  grid-row: 3;
+  background: #8b5a2b;
+  border-radius: 0 0 15px 15px;
+  border: 3px solid #5c3a1b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bucket-water {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: #2a9df4;
+  transition: height 0.4s ease;
+}
+
+.bucket-label {
+  position: relative;
+  z-index: 2;
+  font-size: 0.55rem;
+  color: white;
+  font-weight: bold;
+  text-align: center;
 }
