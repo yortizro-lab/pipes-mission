@@ -160,7 +160,7 @@ function createBoard() {
         row: row,
         col: col,
         correctConnections: connections,
-        rotation: (pipes.length % 3) + 1,
+        rotation: (pipes.length % 4),
         fixed: false
       };
 
