@@ -198,7 +198,40 @@ function createBoard() {
     }
   }
 }
+function addWaterMarkers() {
+  // Remove old markers
+  document.querySelectorAll(".game-faucet, .game-exit").forEach(marker => {
+    marker.remove();
+  });
 
+  // Faucet
+  const faucet = document.createElement("div");
+  faucet.className = "game-faucet";
+  faucet.innerHTML = `
+    <div style="font-size:40px;">🚰</div>
+    <strong>FAUCET</strong>
+  `;
+
+  faucet.style.textAlign = "center";
+  faucet.style.color = "white";
+  faucet.style.margin = "0 auto 8px";
+
+  board.parentElement.insertBefore(faucet, board);
+
+  // Water exit
+  const exit = document.createElement("div");
+  exit.className = "game-exit";
+  exit.innerHTML = `
+    <div style="font-size:40px;">💧</div>
+    <strong>WATER EXIT</strong>
+  `;
+
+  exit.style.textAlign = "center";
+  exit.style.color = "white";
+  exit.style.margin = "8px auto 0";
+
+  board.parentElement.appendChild(exit);
+}
 function rotatePipe(index) {
     if (!gameStarted || gameOver) return;
 
@@ -452,7 +485,8 @@ function startGame(){
   gameStarted = true;
 
   createBoard();
-
+  addWaterMarkers();
+  
   message.textContent =
     "🚰 Water is ready! Repair the pipes!";
 
