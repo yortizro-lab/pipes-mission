@@ -198,7 +198,6 @@ function createBoard() {
     }
   }
 }
-  addWaterMarkers();
 
 function rotatePipe(index) {
     if (!gameStarted || gameOver) return;
