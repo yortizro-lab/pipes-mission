@@ -1,16 +1,93 @@
 /**
- * Pipes Mission - Core Game Logic with Bucket Progress & Pipe Repair
+ * Pipes Mission - Multi-Level Game Logic with Bucket Progress & Pipe Repair
  */
 
-// --- Game Configuration & State ---
-const BOARD_ROWS = 3;
-const BOARD_COLS = 4;
+// --- Game Levels Definition ---
+const LEVELS = [
+  // LEVEL 1: Simple 3x3 layout, no broken pipes, easy intro
+  {
+    levelNumber: 1,
+    rows: 3,
+    cols: 3,
+    time: 120,
+    movesAllowed: 10,
+    targetBucketPos: { row: 2, col: 2 },
+    sourcePos: { row: 0, col: 1 },
+    grid: [
+      { row: 0, col: 0, type: 'corner', rot: 90, broken: false },
+      { row: 0, col: 1, type: 'straight', rot: 90, broken: false }, // Faucet input
+      { row: 0, col: 2, type: 'corner', rot: 180, broken: false },
+
+      { row: 1, col: 0, type: 'straight', rot: 0, broken: false },
+      { row: 1, col: 1, type: 'corner', rot: 270, broken: false },
+      { row: 1, col: 2, type: 'straight', rot: 0, broken: false },
+
+      { row: 2, col: 0, type: 'corner', rot: 0, broken: false },
+      { row: 2, col: 1, type: 'straight', rot: 90, broken: false },
+      { row: 2, col: 2, type: 'bucket', rot: 0, broken: false } // Target Bucket
+    ]
+  },
+ 
+  // LEVEL 2: 3x3 layout introducing broken pipes
+  {
+    levelNumber: 2,
+    rows: 3,
+    cols: 3,
+    time: 110,
+    movesAllowed: 12,
+    targetBucketPos: { row: 2, col: 2 },
+    sourcePos: { row: 0, col: 1 },
+    grid: [
+      { row: 0, col: 0, type: 'corner', rot: 0, broken: false },
+      { row: 0, col: 1, type: 'straight', rot: 0, broken: true },
+      { row: 0, col: 2, type: 'corner', rot: 90, broken: false },
+
+      { row: 1, col: 0, type: 'straight', rot: 90, broken: true },
+      { row: 1, col: 1, type: 'cross', rot: 0, broken: false },
+      { row: 1, col: 2, type: 'straight', rot: 0, broken: false },
+
+      { row: 2, col: 0, type: 'corner', rot: 180, broken: false },
+      { row: 2, col: 1, type: 'straight', rot: 90, broken: false },
+      { row: 2, col: 2, type: 'bucket', rot: 0, broken: false }
+    ]
+  },
+
+  // LEVEL 3: Full 4x3 layout (The original challenge)
+  {
+    levelNumber: 3,
+    rows: 3,
+    cols: 4,
+    time: 102,
+    movesAllowed: 15,
+    targetBucketPos: { row: 2, col: 2 },
+    sourcePos: { row: 0, col: 1 },
+    grid: [
+      { row: 0, col: 0, type: 'corner', rot: 90, broken: false },
+      { row: 0, col: 1, type: 'straight', rot: 0, broken: false },
+      { row: 0, col: 2, type: 'straight', rot: 0, broken: true },
+      { row: 0, col: 3, type: 'corner', rot: 180, broken: true },
+
+      { row: 1, col: 0, type: 'corner', rot: 0, broken: true },
+      { row: 1, col: 1, type: 'straight', rot: 90, broken: true },
+      { row: 1, col: 2, type: 'cross', rot: 0, broken: false },
+      { row: 1, col: 3, type: 'corner', rot: 270, broken: false },
+
+      { row: 2, col: 0, type: 'corner', rot: 270, broken: false },
+      { row: 2, col: 1, type: 'straight', rot: 90, broken: false },
+      { row: 2, col: 2, type: 'bucket', rot: 0, broken: false },
+      { row: 2, col: 3, type: 'corner', rot: 180, broken: false }
+    ]
+  }
+];
+
+// --- Global State ---
+let currentLevelIndex = 0;
 let moves = 0;
 let targetPercent = 0;
-let timeLeft = 102; // 1 min 42 sec
+let timeLeft = 0;
 let timerInterval = null;
+let gridState = [];
 
-// Definition of Pipe Types & Open Directions (N, E, S, W)
 const PIPE_TYPES = {
   straight: ['N', 'S'],
   corner: ['S', 'E'],
@@ -25,27 +102,42 @@ const DIRECTIONS = {
   W: { row: 0, col: -1, opposite: 'E' }
 };
 
-// Initial Level Layout matching Level 3 design
-let gridState = [
-  { row: 0, col: 0, type: 'corner', rot: 90, broken: false },
-  { row: 0, col: 1, type: 'straight', rot: 0, broken: false }, // Faucet Connection Point
-  { row: 0, col: 2, type: 'straight', rot: 0, broken: true },
-  { row: 0, col: 3, type: 'corner', rot: 180, broken: true },
+// --- Level Controls ---
 
-  { row: 1, col: 0, type: 'corner', rot: 0, broken: true },
-  { row: 1, col: 1, type: 'straight', rot: 90, broken: true },
-  { row: 1, col: 2, type: 'cross', rot: 0, broken: false },
-  { row: 1, col: 3, type: 'corner', rot: 270, broken: false },
+function loadLevel(levelIdx) {
+  if (levelIdx >= LEVELS.length) {
+    alert("🎉 Congratulations! You have completed all levels!");
+    levelIdx = 0; // Restart from Level 1
+  }
 
-  { row: 2, col: 0, type: 'corner', rot: 270, broken: false },
-  { row: 2, col: 1, type: 'straight', rot: 90, broken: false },
-  { row: 2, col: 2, type: 'bucket', rot: 0, broken: false }, // Target Bucket
-  { row: 2, col: 3, type: 'corner', rot: 180, broken: false }
-];
+  currentLevelIndex = levelIdx;
+  const currentLevel = LEVELS[currentLevelIndex];
 
-// --- Core Helper Functions ---
+  // Deep clone level grid to prevent mutating template data
+  gridState = JSON.parse(JSON.stringify(currentLevel.grid));
+  moves = 0;
+  targetPercent = 0;
+  timeLeft = currentLevel.time;
 
-/** Calculates rotated direction openings based on angle (0, 90, 180, 270) */
+  // Update UI Elements
+  const titleEl = document.querySelector('.level-title');
+  if (titleEl) titleEl.textContent = `LEVEL ${currentLevel.levelNumber} — PIPE REPAIR`;
+
+  document.getElementById('moves').textContent = moves;
+
+  // Set CSS grid dynamic column count for varying layout sizes
+  const gridContainer = document.getElementById('grid');
+  if (gridContainer) {
+    gridContainer.style.gridTemplateColumns = `repeat(${currentLevel.cols}, 1fr)`;
+  }
+
+  clearInterval(timerInterval);
+  startTimer();
+  evaluateWaterFlow();
+  renderGrid();
+}
+
+/** Calculates pipe direction openings based on angle */
 function getTileOpenings(tile) {
   if (tile.broken || tile.type === 'bucket') return [];
  
@@ -59,7 +151,6 @@ function getTileOpenings(tile) {
   });
 }
 
-/** Checks if two adjacent tiles have matching open ends */
 function canConnect(tileA, tileB, directionKey) {
   const openingsA = getTileOpenings(tileA);
   const openingsB = getTileOpenings(tileB);
@@ -68,12 +159,11 @@ function canConnect(tileA, tileB, directionKey) {
   return openingsA.includes(directionKey) && openingsB.includes(oppDir);
 }
 
-/** Breadth-First Search (BFS) Pathfinding from Faucet to Bucket */
+/** Pathfinding to check water path */
 function evaluateWaterFlow() {
-  const sourceTile = gridState.find(t => t.row === 0 && t.col === 1);
-  const targetBucket = gridState.find(t => t.type === 'bucket');
+  const currentLevel = LEVELS[currentLevelIndex];
+  const sourceTile = gridState.find(t => t.row === currentLevel.sourcePos.row && t.col === currentLevel.sourcePos.col);
  
-  // Clear connected/leaking flags across board
   gridState.forEach(t => { t.filled = false; t.leaking = false; });
 
   if (!sourceTile || sourceTile.broken) {
@@ -96,7 +186,6 @@ function evaluateWaterFlow() {
 
       if (neighbor) {
         if (neighbor.type === 'bucket') {
-          // Check if current tile points down into the bucket
           const openings = getTileOpenings(current);
           if (dir === 'S' && openings.includes('S')) {
             reachesBucket = true;
@@ -107,7 +196,6 @@ function evaluateWaterFlow() {
             neighbor.filled = true;
             queue.push(neighbor);
           } else {
-            // Unconnected open end causes water leakage
             const openings = getTileOpenings(current);
             if (openings.includes(dir) && neighbor.broken) {
               current.leaking = true;
@@ -118,18 +206,22 @@ function evaluateWaterFlow() {
     }
   }
 
-  // Update Progress Fill
-  targetPercent = reachesBucket ? 100 : Math.min(75, visited.size * 15);
+  targetPercent = reachesBucket ? 100 : Math.min(75, visited.size * 20);
   updateProgressUI(targetPercent);
-}
 
-// --- Interaction & Rendering ---
+  // Check level completion
+  if (reachesBucket && targetPercent === 100) {
+    setTimeout(() => {
+      alert(`Level ${LEVELS[currentLevelIndex].levelNumber} Complete! Moving to next level...`);
+      loadLevel(currentLevelIndex + 1);
+    }, 400);
+  }
+}
 
 function handleTileClick(index) {
   const tile = gridState[index];
   if (tile.type === 'bucket') return;
 
-  // Repair broken pipe first; rotate normally if fixed
   if (tile.broken) {
     tile.broken = false;
   } else {
@@ -199,14 +291,13 @@ function startTimer() {
       if (timerEl) timerEl.textContent = `${mins}:${secs}`;
     } else {
       clearInterval(timerInterval);
-      alert("Time's up! Try fixing the pipes faster next time.");
+      alert("Time's up! Reloading level...");
+      loadLevel(currentLevelIndex);
     }
   }, 1000);
 }
 
-// --- Initialization ---
+// --- Init Game on Level 1 ---
 document.addEventListener('DOMContentLoaded', () => {
-  renderGrid();
-  evaluateWaterFlow();
-  startTimer();
+  loadLevel(0); // Starts game on Level 1
 });
