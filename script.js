@@ -480,7 +480,7 @@ function startGame(){
   score = 0;
   level = 1;
   moves = 0;
-  timeLeft = 30;
+  timeLeft = 60;
   gameOver = false;
   gameStarted = true;
 
