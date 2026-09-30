@@ -8,10 +8,10 @@ const LEVELS = [
     sourcePos: { row: 0, col: 1 },
     grid: [
       { row: 0, col: 0, type: 'corner', rot: 90, broken: false },
-      { row: 0, col: 1, type: 'straight', rot: 90, broken: false },
+      { row: 0, col: 1, type: 'straight', rot: 0, broken: false }, // Direct connection under faucet
       { row: 0, col: 2, type: 'corner', rot: 180, broken: false },
 
-      { row: 1, col: 0, type: 'straight', rot: 0, broken: false },
+      { row: 1, col: 0, type: 'straight', rot: 90, broken: false },
       { row: 1, col: 1, type: 'corner', rot: 270, broken: false },
       { row: 1, col: 2, type: 'straight', rot: 0, broken: false },
 
@@ -106,7 +106,6 @@ function loadLevel(idx) {
   timeLeft = currentLevel.time;
   isPaused = false;
 
-  // Header update
   const titleEl = document.getElementById('level-title');
   if (titleEl) titleEl.textContent = `LEVEL ${currentLevel.levelNumber} — PIPE REPAIR`;
  
@@ -148,7 +147,9 @@ function evaluateWaterFlow() {
 
   gridState.forEach(t => { t.filled = false; t.leaking = false; });
 
-  if (!sourceTile || sourceTile.broken) {
+  // If the pipe right under the faucet isn't pointing UP ('N'), no water enters
+  const sourceOpenings = getTileOpenings(sourceTile);
+  if (!sourceTile || sourceTile.broken || !sourceOpenings.includes('N')) {
     updateProgressUI(0);
     return;
   }
@@ -188,7 +189,8 @@ function evaluateWaterFlow() {
     }
   }
 
-  targetPercent = reachesBucket ? 100 : Math.min(75, visited.size * 20);
+  // Strictly 100% when full path connects to bucket, 0% when disconnected
+  targetPercent = reachesBucket ? 100 : 0;
   updateProgressUI(targetPercent);
 
   if (reachesBucket && targetPercent === 100) {
@@ -280,10 +282,9 @@ function startTimer() {
   }, 1000);
 }
 
-// Attach Top Button Listeners
 function setupControls() {
   document.getElementById('btn-back')?.addEventListener('click', () => {
-    loadLevel(currentLevelIdx); // Restart level
+    loadLevel(currentLevelIdx);
   });
 
   document.getElementById('btn-pause')?.addEventListener('click', () => {
@@ -296,12 +297,11 @@ function setupControls() {
   });
 
   document.getElementById('btn-settings')?.addEventListener('click', () => {
-    alert("⚙️️ Settings: Turn off audio or restart level from here.");
+    alert("⚙ Settings: Turn off audio or restart level from here.");
   });
 }
 
-// Initializing Game
 document.addEventListener('DOMContentLoaded', () => {
   setupControls();
-  loadLevel(0); // Forces start at Level 1
+  loadLevel(0);
 });
