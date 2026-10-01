@@ -91,6 +91,31 @@ body {
   color: #0d2847;
 }
 
+.btn-start {
+  width: 100%;
+  min-height: 42px;
+  border: 2px solid #5fa4f0;
+  border-radius: 10px;
+  background: #1c5296;
+  color: white;
+  font: inherit;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #123766;
+  touch-action: manipulation;
+}
+
+.btn-start:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #123766;
+}
+
+.btn-start:focus-visible {
+  outline: 3px solid #0d2847;
+  outline-offset: 2px;
+}
+
 .progress-bar-bg {
   width: 100%;
   height: 10px;

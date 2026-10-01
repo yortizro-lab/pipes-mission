@@ -331,6 +331,11 @@ function startTimer() {
 }
 
 function setupControls() {
+  document.getElementById('btn-start')?.addEventListener('click', () => {
+    loadLevel(currentLevelIdx);
+    isPaused = false;
+  });
+
   document.getElementById('btn-back')?.addEventListener('click', () => {
     loadLevel(currentLevelIdx);
   });
