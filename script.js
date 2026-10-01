@@ -120,7 +120,6 @@ function loadLevel(idx) {
   updateTimerUI();
   startTimer();
   evaluateWaterFlow();
-  renderGrid();
 }
 
 function getTileOpenings(tile) {
@@ -135,66 +134,87 @@ function getTileOpenings(tile) {
   });
 }
 
-function canConnect(tileA, tileB, directionKey) {
-  const openingsA = getTileOpenings(tileA);
-  const openingsB = getTileOpenings(tileB);
-  const oppDir = DIRECTIONS[directionKey].opposite;
-  return openingsA.includes(directionKey) && openingsB.includes(oppDir);
+function getTileKey(tile) {
+  return `${tile.row},${tile.col}`;
 }
 
-function evaluateWaterFlow() {
+function getTileAt(row, col) {
+  return gridState.find(tile => tile.row === row && tile.col === col);
+}
+
+function rotatePipe(tile) {
+  if (!tile || tile.type === 'bucket') return;
+
+  if (tile.broken) tile.broken = false;
+  tile.rot = (tile.rot + 90) % 360;
+}
+
+function isValidConnection(tileA, tileB, directionKey) {
+  if (!tileA || !tileB) return false;
+
+  const oppositeDirection = DIRECTIONS[directionKey].opposite;
+  return (
+    getTileOpenings(tileA).includes(directionKey) &&
+    getTileOpenings(tileB).includes(oppositeDirection)
+  );
+}
+
+function findWaterPath() {
   const level = LEVELS[currentLevelIdx];
-  const sourceTile = gridState.find(t => t.row === level.sourcePos.row && t.col === level.sourcePos.col);
+  const sourceTile = getTileAt(level.sourcePos.row, level.sourcePos.col);
+  const path = new Set();
+  const queue = [];
 
-  gridState.forEach(t => { t.filled = false; t.leaking = false; });
-  updateFaucetUI(false);
-
-  // If the pipe under the faucet isn't pointing UP ('N'), no water enters
   if (!sourceTile || sourceTile.broken || !getTileOpenings(sourceTile).includes('N')) {
-    updateProgressUI(0);
-    return;
+    return { path, reachesBucket: false };
   }
 
-  let queue = [sourceTile];
-  let visited = new Set([`${sourceTile.row},${sourceTile.col}`]);
-  sourceTile.filled = true;
-  updateFaucetUI(true);
-  let reachesBucket = false;
+  path.add(getTileKey(sourceTile));
+  queue.push(sourceTile);
 
   while (queue.length > 0) {
-    let current = queue.shift();
+    const current = queue.shift();
 
-    for (let dir in DIRECTIONS) {
-      let nextRow = current.row + DIRECTIONS[dir].row;
-      let nextCol = current.col + DIRECTIONS[dir].col;
-      let neighbor = gridState.find(t => t.row === nextRow && t.col === nextCol);
+    for (const directionKey of Object.keys(DIRECTIONS)) {
+      const direction = DIRECTIONS[directionKey];
+      const neighbor = getTileAt(current.row + direction.row, current.col + direction.col);
 
-      if (neighbor) {
-        if (!visited.has(`${nextRow},${nextCol}`)) {
-          if (canConnect(current, neighbor, dir)) {
-            if (neighbor.type === 'bucket') {
-              reachesBucket = true;
-              continue;
-            }
-            visited.add(`${nextRow},${nextCol}`);
-            neighbor.filled = true;
-            queue.push(neighbor);
-          } else {
-            const openings = getTileOpenings(current);
-            if (openings.includes(dir) && neighbor.broken) {
-              current.leaking = true;
-            }
-          }
-        }
+      if (!neighbor) continue;
+
+      const neighborKey = getTileKey(neighbor);
+      if (path.has(neighborKey)) continue;
+
+      if (isValidConnection(current, neighbor, directionKey)) {
+        path.add(neighborKey);
+        if (neighbor.type !== 'bucket') queue.push(neighbor);
       }
     }
   }
 
-  // Strictly 100% when full path connects to bucket, 0% when disconnected
-  targetPercent = reachesBucket ? 100 : 0;
-  updateProgressUI(targetPercent);
+  const bucket = gridState.find(tile => tile.type === 'bucket');
+  return {
+    path,
+    reachesBucket: Boolean(bucket && path.has(getTileKey(bucket)))
+  };
+}
 
-  if (reachesBucket && targetPercent === 100 && !levelComplete) {
+function updateWaterFlow() {
+  const { path, reachesBucket } = findWaterPath();
+
+  gridState.forEach(tile => {
+    tile.filled = path.has(getTileKey(tile));
+    tile.leaking = false;
+  });
+
+  targetPercent = reachesBucket ? 100 : 0;
+  updateFaucetUI(path.size > 0);
+  updateProgressUI(targetPercent);
+  renderGrid();
+  checkWin(reachesBucket);
+}
+
+function checkWin(reachesBucket) {
+  if (reachesBucket && !levelComplete) {
     levelComplete = true;
     setTimeout(() => {
       alert(`Level ${LEVELS[currentLevelIdx].levelNumber} Complete!`);
@@ -203,20 +223,21 @@ function evaluateWaterFlow() {
   }
 }
 
+function evaluateWaterFlow() {
+  updateWaterFlow();
+}
+
 function handleTileClick(index) {
   if (isPaused || levelComplete) return;
 
   const tile = gridState[index];
-  if (tile.type === 'bucket') return;
+  if (!tile || tile.type === 'bucket') return;
 
-  if (tile.broken) tile.broken = false;
-  tile.rot = (tile.rot + 90) % 360;
-
+  rotatePipe(tile);
   moves++;
   document.getElementById('moves').textContent = moves;
 
-  evaluateWaterFlow();
-  renderGrid();
+  updateWaterFlow();
 }
 
 function updateProgressUI(pct) {
