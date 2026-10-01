@@ -8,7 +8,7 @@ const LEVELS = [
     sourcePos: { row: 0, col: 1 },
     grid: [
       { row: 0, col: 0, type: 'corner', rot: 90, broken: false },
-      { row: 0, col: 1, type: 'straight', rot: 0, broken: false }, // Direct connection under faucet
+      { row: 0, col: 1, type: 'straight', rot: 0, broken: false },
       { row: 0, col: 2, type: 'corner', rot: 180, broken: false },
 
       { row: 1, col: 0, type: 'straight', rot: 90, broken: false },
@@ -21,7 +21,6 @@ const LEVELS = [
     ]
   },
   
-  // LEVEL 2: 3x3 introducing broken pipes
   {
     levelNumber: 2,
     rows: 3,
@@ -43,7 +42,6 @@ const LEVELS = [
     ]
   },
 
-  // LEVEL 3: 4x3 Grid Challenge
   {
     levelNumber: 3,
     rows: 3,
@@ -76,12 +74,13 @@ let timeLeft = 0;
 let timerInterval = null;
 let isPaused = false;
 let gridState = [];
+let levelComplete = false;
 
 const PIPE_TYPES = {
   straight: ['N', 'S'],
   corner: ['S', 'E'],
   cross: ['N', 'E', 'S', 'W'],
-  bucket: []
+  bucket: ['N']
 };
 
 const DIRECTIONS = {
@@ -105,6 +104,7 @@ function loadLevel(idx) {
   targetPercent = 0;
   timeLeft = currentLevel.time;
   isPaused = false;
+  levelComplete = false;
 
   const titleEl = document.getElementById('level-title');
   if (titleEl) titleEl.textContent = `LEVEL ${currentLevel.levelNumber} — PIPE REPAIR`;
@@ -117,13 +117,14 @@ function loadLevel(idx) {
   }
 
   clearInterval(timerInterval);
+  updateTimerUI();
   startTimer();
   evaluateWaterFlow();
   renderGrid();
 }
 
 function getTileOpenings(tile) {
-  if (tile.broken || tile.type === 'bucket') return [];
+  if (tile.broken) return [];
   const base = PIPE_TYPES[tile.type] || [];
   const shift = (tile.rot / 90) % 4;
   const dirOrder = ['N', 'E', 'S', 'W'];
@@ -146,10 +147,10 @@ function evaluateWaterFlow() {
   const sourceTile = gridState.find(t => t.row === level.sourcePos.row && t.col === level.sourcePos.col);
 
   gridState.forEach(t => { t.filled = false; t.leaking = false; });
+  updateFaucetUI(false);
 
-  // If the pipe right under the faucet isn't pointing UP ('N'), no water enters
-  const sourceOpenings = getTileOpenings(sourceTile);
-  if (!sourceTile || sourceTile.broken || !sourceOpenings.includes('N')) {
+  // If the pipe under the faucet isn't pointing UP ('N'), no water enters
+  if (!sourceTile || sourceTile.broken || !getTileOpenings(sourceTile).includes('N')) {
     updateProgressUI(0);
     return;
   }
@@ -157,6 +158,7 @@ function evaluateWaterFlow() {
   let queue = [sourceTile];
   let visited = new Set([`${sourceTile.row},${sourceTile.col}`]);
   sourceTile.filled = true;
+  updateFaucetUI(true);
   let reachesBucket = false;
 
   while (queue.length > 0) {
@@ -168,13 +170,12 @@ function evaluateWaterFlow() {
       let neighbor = gridState.find(t => t.row === nextRow && t.col === nextCol);
 
       if (neighbor) {
-        if (neighbor.type === 'bucket') {
-          const openings = getTileOpenings(current);
-          if (dir === 'S' && openings.includes('S')) {
-            reachesBucket = true;
-          }
-        } else if (!visited.has(`${nextRow},${nextCol}`)) {
+        if (!visited.has(`${nextRow},${nextCol}`)) {
           if (canConnect(current, neighbor, dir)) {
+            if (neighbor.type === 'bucket') {
+              reachesBucket = true;
+              continue;
+            }
             visited.add(`${nextRow},${nextCol}`);
             neighbor.filled = true;
             queue.push(neighbor);
@@ -193,7 +194,8 @@ function evaluateWaterFlow() {
   targetPercent = reachesBucket ? 100 : 0;
   updateProgressUI(targetPercent);
 
-  if (reachesBucket && targetPercent === 100) {
+  if (reachesBucket && targetPercent === 100 && !levelComplete) {
+    levelComplete = true;
     setTimeout(() => {
       alert(`Level ${LEVELS[currentLevelIdx].levelNumber} Complete!`);
       loadLevel(currentLevelIdx + 1);
@@ -202,16 +204,13 @@ function evaluateWaterFlow() {
 }
 
 function handleTileClick(index) {
-  if (isPaused) return;
+  if (isPaused || levelComplete) return;
 
   const tile = gridState[index];
   if (tile.type === 'bucket') return;
 
-  if (tile.broken) {
-    tile.broken = false;
-  } else {
-    tile.rot = (tile.rot + 90) % 360;
-  }
+  if (tile.broken) tile.broken = false;
+  tile.rot = (tile.rot + 90) % 360;
 
   moves++;
   document.getElementById('moves').textContent = moves;
@@ -228,6 +227,21 @@ function updateProgressUI(pct) {
   if (fillEl) fillEl.style.width = `${pct}%`;
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (bucketWater) bucketWater.style.height = `${pct}%`;
+}
+
+function updateTimerUI() {
+  const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+  const secs = (timeLeft % 60).toString().padStart(2, '0');
+  const timerEl = document.getElementById('timer');
+  if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+}
+
+function updateFaucetUI(isFlowing) {
+  const faucetEl = document.querySelector('.faucet');
+  if (faucetEl) {
+    faucetEl.classList.toggle('flowing', isFlowing);
+    faucetEl.setAttribute('aria-label', isFlowing ? 'Water flowing' : 'Faucet');
+  }
 }
 
 function renderGrid() {
@@ -247,10 +261,17 @@ function renderGrid() {
       `;
     } else {
       tileEl.className = `tile ${tile.broken ? 'broken' : ''} ${tile.leaking ? 'leaking' : ''}`;
+      tileEl.setAttribute('role', 'button');
+      tileEl.setAttribute(
+        'aria-label',
+        `${tile.type} pipe, rotated ${tile.rot} degrees${tile.broken ? ', broken' : ''}`
+      );
+      tileEl.setAttribute('tabindex', isPaused ? '-1' : '0');
 
       const pipeEl = document.createElement('div');
       pipeEl.className = `pipe ${tile.filled ? 'active' : ''}`;
       pipeEl.style.transform = `rotate(${tile.rot}deg)`;
+      pipeEl.style.setProperty('--flow-delay', `${(tile.row + tile.col) * 80}ms`);
 
       if (tile.type === 'straight') pipeEl.innerHTML = `<div class="pipe-straight"></div>`;
       if (tile.type === 'corner') pipeEl.innerHTML = `<div class="pipe-corner"></div>`;
@@ -260,6 +281,12 @@ function renderGrid() {
       tileEl.innerHTML += `<div class="leak-effect">💦</div>`;
 
       tileEl.addEventListener('click', () => handleTileClick(idx));
+      tileEl.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleTileClick(idx);
+        }
+      });
     }
 
     gridContainer.appendChild(tileEl);
@@ -293,7 +320,7 @@ function setupControls() {
   });
 
   document.getElementById('btn-hint')?.addEventListener('click', () => {
-    alert("💡 Hint: Click cracked tiles to repair them first, then rotate them from top to bottom.");
+    alert("💡 Hint: Every click rotates a pipe 90°. Start with the pipe under the faucet and match each opening.");
   });
 
   document.getElementById('btn-settings')?.addEventListener('click', () => {
