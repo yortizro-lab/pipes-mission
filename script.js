@@ -20,7 +20,7 @@ const LEVELS = [
       { row: 2, col: 2, type: 'bucket', rot: 0, broken: false }
     ]
   },
- 
+  
   // LEVEL 2: 3x3 introducing broken pipes
   {
     levelNumber: 2,
@@ -108,7 +108,7 @@ function loadLevel(idx) {
 
   const titleEl = document.getElementById('level-title');
   if (titleEl) titleEl.textContent = `LEVEL ${currentLevel.levelNumber} — PIPE REPAIR`;
- 
+  
   document.getElementById('moves').textContent = moves;
 
   const gridContainer = document.getElementById('grid');
