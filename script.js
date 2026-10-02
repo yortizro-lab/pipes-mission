@@ -284,7 +284,9 @@ function checkWin(reachesBucket) {
       gameStarted = false;
       updateStatus('🎉 Mission complete! Press START to play again.');
       const winBanner = document.getElementById('win-banner');
-      if (winBanner) winBanner.hidden = false;
+      if (winBanner && currentLevelIdx === LEVELS.length - 1 && targetPercent === 100) {
+        winBanner.hidden = false;
+      }
     }
   }, 1400);
 }
