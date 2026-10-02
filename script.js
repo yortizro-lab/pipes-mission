@@ -283,6 +283,8 @@ function checkWin(reachesBucket) {
     } else {
       gameStarted = false;
       updateStatus('🎉 Mission complete! Press START to play again.');
+      const winBanner = document.getElementById('win-banner');
+      if (winBanner) winBanner.hidden = false;
     }
   }, 1400);
 }
@@ -386,7 +388,9 @@ function startTimer() {
     }
     clearInterval(timerInterval);
     gameStarted = false;
-    updateStatus("Time's up! Press START to try again.");
+    const startButton = document.getElementById('btn-start');
+    if (startButton) startButton.textContent = 'RETRY LEVEL';
+    updateStatus("Time's up! Press RETRY LEVEL to try again.");
   }, 1000);
 }
 
@@ -396,7 +400,11 @@ function setupControls() {
       score = 0;
       currentLevelIdx = 0;
     }
+    const winBanner = document.getElementById('win-banner');
+    if (winBanner) winBanner.hidden = true;
     gameStarted = true;
+    const startButton = document.getElementById('btn-start');
+    if (startButton) startButton.textContent = 'START';
     loadLevel(currentLevelIdx);
   });
   document.getElementById('btn-back')?.addEventListener('click', () => loadLevel(currentLevelIdx));
