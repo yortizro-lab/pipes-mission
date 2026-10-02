@@ -162,6 +162,14 @@ body {
   margin-top: 15px;
 }
 
+.game-status {
+  min-height: 1.2em;
+  color: white;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 1px 1px 0 #123766;
+}
+
 /* Tiles & Touch Controls */
 .tile {
   aspect-ratio: 1;
@@ -211,24 +219,48 @@ body {
 }
 
 .pipe-straight {
-  width: 20px;
+  width: 24px;
   height: 100%;
   position: absolute;
   top: 0;
-  bottom: 0;
-  left: calc(100% - 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: center;
   background: #8e9ca8;
+}
+
+.straight-rot-90 .pipe-straight {
+  transform: translateX(-50%) rotate(90deg);
+}
+
+.straight-rot-180 .pipe-straight {
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.straight-rot-270 .pipe-straight {
+  transform: translateX(-50%) rotate(270deg);
 }
 
 .pipe-corner {
   width: 100%;
   height: 100%;
-  border-bottom: 20px solid #8e9ca8;
-  border-right: 20px solid #8e9ca8;
-  border-bottom-right-radius: 20px;
+  border-bottom: 24px solid #8e9ca8;
+  border-right: 24px solid #8e9ca8;
+  border-bottom-right-radius: 24px;
   position: absolute;
   bottom: 0;
   right: 0;
+}
+
+.level-success {
+  animation: level-success 0.7s ease-in-out 2;
+}
+
+@keyframes level-success {
+  50% {
+    box-shadow: 0 0 22px #73c6ff;
+    transform: scale(1.02);
+  }
 }
 
 .pipe.active .pipe-corner {
@@ -384,14 +416,6 @@ body {
     margin-top: 12px;
   }
 
-  .pipe-corner {
-    border-width: 10px;
-  }
-
-  .pipe-straight {
-    width: 10px;
-    left: calc(100% - 10px);
-  }
 }
 
 .bucket-water {
