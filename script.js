@@ -1,12 +1,16 @@
 const LEVELS = [
   {
     levelNumber: 1,
-    rows: 3,
+    rows: 2,
     cols: 3,
     time: 120,
-    path: [[0, 1], [1, 1], [1, 0], [2, 0], [2, 1]],
-    bucket: [2, 2],
-    fillers: [{ row: 0, col: 0, type: 'corner' }]
+    path: [[0, 1], [1, 1], [1, 0]],
+    bucket: [2, 0],
+    fillers: [
+      { row: 0, col: 0, type: 'corner' },
+      { row: 0, col: 2, type: 'straight' },
+      { row: 1, col: 2, type: 'corner' }
+    ]
   },
   {
     levelNumber: 2,
@@ -139,8 +143,13 @@ function createSolvedGrid(level) {
 
 function scrambleGrid(tiles) {
   let hasRotation = false;
+  const source = LEVELS[currentLevelIdx].path[0];
   tiles.forEach(tile => {
     if (tile.type === 'bucket') return;
+    if (tile.row === source[0] && tile.col === source[1]) {
+      tile.rot = tile.solvedRot;
+      return;
+    }
     const rotations = [0, 90, 180, 270];
     const choices = rotations.filter(rotation => rotation !== tile.solvedRot);
     tile.rot = choices[Math.floor(Math.random() * choices.length)];
@@ -308,6 +317,18 @@ function updateFaucetUI(isFlowing) {
   if (faucetEl) faucetEl.classList.toggle('flowing', isFlowing);
 }
 
+function positionFaucet() {
+  const faucetEl = document.querySelector('.faucet');
+  const boardEl = document.querySelector('.board-container');
+  const sourceTile = document.querySelector('.tile[data-source="faucet"]');
+  if (!faucetEl || !boardEl || !sourceTile) return;
+
+  const boardRect = boardEl.getBoundingClientRect();
+  const sourceRect = sourceTile.getBoundingClientRect();
+  faucetEl.style.left = `${sourceRect.left + sourceRect.width / 2 - boardRect.left}px`;
+  faucetEl.style.top = `${sourceRect.top - boardRect.top - 8}px`;
+}
+
 function renderGrid() {
   const gridContainer = document.getElementById('grid');
   if (!gridContainer) return;
@@ -324,11 +345,18 @@ function renderGrid() {
     }
 
     tileEl.className = `tile ${tile.filled ? 'filled' : ''}`;
+    tileEl.dataset.row = tile.row;
+    tileEl.dataset.col = tile.col;
+    if (tile.row === LEVELS[currentLevelIdx].path[0][0]
+      && tile.col === LEVELS[currentLevelIdx].path[0][1]) {
+      tileEl.dataset.source = 'faucet';
+    }
     tileEl.setAttribute('role', 'button');
     tileEl.setAttribute('aria-label', `${tile.type} pipe, rotated ${tile.rot} degrees`);
     tileEl.setAttribute('tabindex', isPaused || !gameStarted ? '-1' : '0');
     const pipeEl = document.createElement('div');
     pipeEl.className = `pipe ${tile.filled ? 'active' : ''} ${tile.type === 'straight' ? `straight-rot-${tile.rot}` : ''}`;
+    pipeEl.dataset.openings = getTileOpenings(tile).join('');
     pipeEl.style.transform = tile.type === 'straight' ? 'none' : `rotate(${tile.rot}deg)`;
     pipeEl.style.setProperty('--flow-delay', `${(tile.row + tile.col) * 80}ms`);
     pipeEl.innerHTML = tile.type === 'straight'
@@ -344,6 +372,7 @@ function renderGrid() {
     });
     gridContainer.appendChild(tileEl);
   });
+  positionFaucet();
 }
 
 function startTimer() {

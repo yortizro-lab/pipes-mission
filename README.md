@@ -5,7 +5,7 @@
 
 The game contains three generated pipe-repair levels:
 
-- Level 1 uses a 3x3 board.
+- Level 1 uses a 2x3 board.
 - Level 2 uses a 4x4 board.
 - Level 3 uses a 5x5 board.
 

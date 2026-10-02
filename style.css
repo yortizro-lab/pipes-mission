@@ -5,9 +5,12 @@
   user-select: none;
 }
 
+:root {
+  --pipe-width: 24px;
+}
+
 body {
   font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
-  background: #aadaf7;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -143,9 +146,7 @@ body {
 
 .faucet {
   position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   font-size: 2.2rem;
   z-index: 10;
 }
@@ -158,7 +159,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: 4px;
+  gap: 0;
   margin-top: 15px;
 }
 
@@ -173,7 +174,7 @@ body {
 /* Tiles & Touch Controls */
 .tile {
   aspect-ratio: 1;
-  overflow: hidden;
+  overflow: visible;
   background: #ded0ba;
   border: 2px solid #c2b198;
   border-radius: 8px;
@@ -198,11 +199,11 @@ body {
 
 /* Pipe Visuals */
 .pipe {
-  width: 100%;
-  height: 100%;
-  position: relative;
+  position: absolute;
+  inset: -2px;
   transform-origin: center;
   transition: transform 0.2s ease-out;
+  z-index: 1;
 }
 
 .pipe-inner {
@@ -219,37 +220,53 @@ body {
 }
 
 .pipe-straight {
-  width: 24px;
+  width: var(--pipe-width);
   height: 100%;
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   transform-origin: center;
   background: #8e9ca8;
 }
 
 .straight-rot-90 .pipe-straight {
-  transform: translateX(-50%) rotate(90deg);
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .straight-rot-180 .pipe-straight {
-  transform: translateX(-50%) rotate(180deg);
+  transform: translate(-50%, -50%) rotate(180deg);
 }
 
 .straight-rot-270 .pipe-straight {
-  transform: translateX(-50%) rotate(270deg);
+  transform: translate(-50%, -50%) rotate(270deg);
 }
 
 .pipe-corner {
   width: 100%;
   height: 100%;
-  border-bottom: 24px solid #8e9ca8;
-  border-right: 24px solid #8e9ca8;
-  border-bottom-right-radius: 24px;
   position: absolute;
-  bottom: 0;
-  right: 0;
+}
+
+.pipe-corner::before,
+.pipe-corner::after {
+  content: '';
+  position: absolute;
+  background: #8e9ca8;
+}
+
+.pipe-corner::before {
+  width: var(--pipe-width);
+  height: 50%;
+  top: 50%;
+  left: calc(50% - var(--pipe-width) / 2);
+}
+
+.pipe-corner::after {
+  width: 50%;
+  height: var(--pipe-width);
+  top: calc(50% - var(--pipe-width) / 2);
+  left: 50%;
 }
 
 .level-success {
@@ -264,7 +281,6 @@ body {
 }
 
 .pipe.active .pipe-corner {
-  border-color: #2a9df4 !important;
   box-shadow: 2px 2px 8px #2a9df4;
 }
 
@@ -330,6 +346,28 @@ body {
   animation-delay: var(--flow-delay);
 }
 
+.pipe.active .pipe-corner::before,
+.pipe.active .pipe-corner::after {
+  background: repeating-linear-gradient(
+    180deg,
+    #73c6ff 0 8px,
+    #2a9df4 8px 18px
+  );
+  background-size: 100% 36px;
+  box-shadow: 0 0 8px #2a9df4;
+  animation: water-flow 0.7s linear infinite;
+  animation-delay: var(--flow-delay);
+}
+
+.pipe.active .pipe-corner::after {
+  background: repeating-linear-gradient(
+    90deg,
+    #73c6ff 0 8px,
+    #2a9df4 8px 18px
+  );
+  background-size: 36px 100%;
+}
+
 /* Broken & Leak States */
 .tile.broken .pipe-inner,
 .tile.broken .pipe-corner {
@@ -355,6 +393,12 @@ body {
     opacity: 0.7;
   }
 
+  100% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
   @keyframes water-flow {
     from {
       background-position: 0 0;
@@ -364,33 +408,34 @@ body {
     }
   }
 
-  @keyframes water-pulse {
-    from {
-      filter: brightness(0.95);
-      box-shadow: 2px 2px 5px #2a9df4;
-    }
-    to {
-      filter: brightness(1.2);
-      box-shadow: 2px 2px 12px #73c6ff;
-    }
+@keyframes water-pulse {
+  from {
+    filter: brightness(0.95);
+    box-shadow: 2px 2px 5px #2a9df4;
   }
+  to {
+    filter: brightness(1.2);
+    box-shadow: 2px 2px 12px #73c6ff;
+  }
+}
 
-  @keyframes faucet-flow {
-    from {
-      filter: drop-shadow(0 0 0 #73c6ff);
-    }
-    to {
-      filter: drop-shadow(0 3px 5px #73c6ff);
-    }
+@keyframes faucet-flow {
+  from {
+    filter: drop-shadow(0 0 0 #73c6ff);
   }
-  100% {
-    transform: scale(1.2);
-    opacity: 1;
+  to {
+    filter: drop-shadow(0 3px 5px #73c6ff);
   }
 }
 
 /* Bucket Element */
 .bucket {
+  width: 72%;
+  height: 72%;
+  aspect-ratio: 1;
+  align-self: center;
+  justify-self: center;
+  transform: translateY(15%);
   background: #8b5a2b;
   border-radius: 0 0 15px 15px;
   border: 3px solid #5c3a1b;
@@ -412,7 +457,7 @@ body {
   }
 
   .grid {
-    gap: 3px;
+    gap: 0;
     margin-top: 12px;
   }
 
